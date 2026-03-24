@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  serverExternalPackages: ['handlebars'],
+  serverExternalPackages: ['handlebars', 'genkit', '@genkit-ai/core', '@genkit-ai/googleai', '@genkit-ai/next'],
 };
 
 export default nextConfig;

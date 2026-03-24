@@ -47,9 +47,7 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  experimental: {
-    serverExternalPackages: ['handlebars'],
-  },
+  serverExternalPackages: ['handlebars'],
 };
 
 export default nextConfig;

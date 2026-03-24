@@ -1,0 +1,79 @@
+
+"use client"
+
+import * as React from "react"
+import { Moon, Sun, Palette, Sparkles } from "lucide-react"
+import { useTheme } from "next-themes"
+
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
+
+interface ThemeToggleProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function ThemeToggle({ open, onOpenChange }: ThemeToggleProps) {
+  const { setTheme } = useTheme()
+
+  return (
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md"
+        >
+          <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
+          <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-primary" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Light Themes</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Blue (Default)
+        </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("theme-gold-light")}>
+          Gold
+        </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("theme-pink-light")}>
+          Pink
+        </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("theme-green-light")}>
+          Green
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Dark Themes</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Blue (Default)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("theme-gold-dark")}>
+          Golden Black
+        </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("theme-pink-dark")}>
+          Pink Black
+        </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("theme-green-dark")}>
+          Green Black
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+         <DropdownMenuItem onClick={() => setTheme("theme-genz-dark")} className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            Gen Z Mode
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}

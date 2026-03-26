@@ -19,7 +19,8 @@ export default function IntroAnimation({ onFinish }: IntroAnimationProps) {
         // Preload and play audio
         const audioInstance = new Audio('/intro-sound.mp3');
         audioInstance.play().catch(error => {
-            console.warn("Audio autoplay was prevented by the browser.");
+            // Audio might be missing (404) or autoplay might be blocked
+            console.log("Intro audio info: Playback skipped (missing file or browser restriction)");
         });
         setAudio(audioInstance);
 

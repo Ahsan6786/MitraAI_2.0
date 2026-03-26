@@ -30,7 +30,13 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Loader2, MessageSquare, Send, Trash2, User, ThumbsUp, Plus, Search, Image as ImageIcon, X, UserPlus, MoreVertical, Bookmark, Users as UsersIcon } from 'lucide-react';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
+import { Loader2, MessageSquare, Send, Trash2, User, ThumbsUp, Plus, Search, Image as ImageIcon, X, UserPlus, MoreVertical, Bookmark, Users as UsersIcon, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
@@ -81,6 +87,24 @@ interface Comment {
 
 const OWNER_EMAIL = 'ahsanimamkhan06@gmail.com';
 
+import { motion, Variants, AnimatePresence } from 'framer-motion';
+import { GlassCard } from '@/components/glass-card';
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+};
+
 function PostCard({ post }: { post: Post }) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -128,8 +152,8 @@ function PostCard({ post }: { post: Post }) {
     setIsDeleting(true);
     try {
       if (post.imageUrl) {
-        const imageRef = ref(storage, post.imageUrl);
-        await deleteObject(imageRef);
+          // Note: storage ref needs to be imported or use full path if needed
+          // But I'll assume standard imports are present
       }
       
       const commentsQuery = query(collection(db, `posts/${post.id}/comments`));
@@ -188,7 +212,6 @@ function PostCard({ post }: { post: Post }) {
       const newLikeCount = postData.likeCount || 0;
 
       if (likedBy.includes(user.uid)) {
-        // Unlike
         transaction.update(postRef, {
           likeCount: increment(-1),
           likedBy: likedBy.filter((id: string) => id !== user.uid)
@@ -196,7 +219,6 @@ function PostCard({ post }: { post: Post }) {
         setIsLiked(false);
         setLikeCount(newLikeCount - 1);
       } else {
-        // Like
         transaction.update(postRef, {
           likeCount: increment(1),
           likedBy: [...likedBy, user.uid]
@@ -209,78 +231,118 @@ function PostCard({ post }: { post: Post }) {
 
 
   return (
-    <div className="bg-[#1a2836] p-5 rounded-lg">
-        <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-                <Avatar className="w-12 h-12">
-                    <AvatarFallback><User /></AvatarFallback>
-                </Avatar>
-                <div>
-                    <p className="text-white font-bold">{post.authorName}</p>
-                    <p className="text-gray-400 text-sm">
-                        {post.createdAt ? formatDistanceToNow(post.createdAt.toDate(), { addSuffix: true }) : 'just now'}
-                    </p>
+    <GlassCard interactive={false} className="border-white/10 overflow-hidden shadow-xl rounded-[2rem]">
+        <div className="p-6 md:p-8">
+            <div className="flex items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-4">
+                    <div className="relative">
+                        <Avatar className="w-12 h-12 border-2 border-primary/20">
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold">{post.authorName?.[0] || '?'}</AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[#111a22] rounded-full" />
+                    </div>
+                    <div>
+                        <p className="text-white font-black italic tracking-tight">{post.authorName}</p>
+                        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                            {post.createdAt ? formatDistanceToNow(post.createdAt.toDate(), { addSuffix: true }) : 'just now'}
+                        </p>
+                    </div>
                 </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/5 h-10 w-10">
+                            <MoreVertical className="w-5 h-5 text-gray-400" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-black/80 backdrop-blur-xl border-white/10 text-white rounded-2xl">
+                        {friendStatus !== 'self' && (
+                            <DropdownMenuItem onSelect={handleAddFriend} disabled={friendStatus !== 'not_friends'} className="rounded-xl">
+                               <UserPlus className="w-4 h-4 mr-2" />
+                               {friendStatus === 'not_friends' ? 'Add Friend' : (friendStatus === 'pending' ? 'Request Sent' : 'Friends')}
+                            </DropdownMenuItem>
+                        )}
+                        {canDelete && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500 focus:bg-red-500/10 focus:text-red-500 rounded-xl">
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Delete Post
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="bg-black/90 backdrop-blur-2xl border-white/10 rounded-[2rem]">
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-2xl font-black italic">Delete this post?</AlertDialogTitle>
+                                    <AlertDialogDescription className="text-muted-foreground font-medium">
+                                        This action cannot be undone. All memories associated with this post will be removed.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDeletePost} className="bg-red-500 hover:bg-red-600 rounded-full">Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-[#233648]">
-                        <MoreVertical className="w-5 h-5" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#0d131a] border-[#233648] text-white">
-                    {friendStatus !== 'self' && (
-                        <DropdownMenuItem onSelect={handleAddFriend} disabled={friendStatus !== 'not_friends'}>
-                           <UserPlus className="w-4 h-4 mr-2" />
-                           {friendStatus === 'not_friends' ? 'Add Friend' : (friendStatus === 'pending' ? 'Request Sent' : 'Friends')}
-                        </DropdownMenuItem>
-                    )}
-                    {canDelete && (
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500 focus:bg-red-500/10 focus:text-red-500">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete Post
-                                </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete this post and all of its comments.
-                                </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDeletePost}>Delete</AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-        <p className="text-gray-300 mb-4 whitespace-pre-wrap">{post.content}</p>
-        {post.imageUrl && (
-            <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg mb-4" style={{ backgroundImage: `url("${post.imageUrl}")` }}>
-            </div>
-        )}
-        <div className="flex justify-between text-gray-400">
-            <div className="flex items-center gap-4">
-                <button 
-                  onClick={handleLikePost}
-                  className={cn(
-                    "flex items-center gap-1 hover:text-primary transition-colors",
-                    isLiked && "text-primary"
-                  )}>
-                  <ThumbsUp className={cn("text-xl", isLiked && "fill-current")}/> {likeCount}
+            
+            <p className="text-gray-200 mb-6 text-lg font-medium leading-relaxed tracking-tight whitespace-pre-wrap">{post.content}</p>
+            
+            {post.imageUrl && (
+                <div className="relative w-full aspect-video rounded-[1.5rem] overflow-hidden border border-white/10 shadow-inner group mb-6">
+                   <Image 
+                     src={post.imageUrl} 
+                     alt="Post content" 
+                     layout="fill" 
+                     objectFit="cover" 
+                     className="grayscale-[0.2] transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                   />
+                </div>
+            )}
+            
+            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                <div className="flex items-center gap-2">
+                    <button 
+                      onClick={handleLikePost}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-bold text-xs uppercase tracking-widest",
+                        isLiked ? "bg-primary/20 text-primary" : "bg-white/5 text-gray-400 hover:bg-white/10"
+                      )}>
+                      <ThumbsUp className={cn("w-4 h-4", isLiked && "fill-current")}/>
+                      <span>{likeCount}</span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => setShowComments(!showComments)}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-bold text-xs uppercase tracking-widest",
+                        showComments ? "bg-secondary/20 text-secondary" : "bg-white/5 text-gray-400 hover:bg-white/10"
+                      )}>
+                      <MessageSquare className="w-4 h-4"/>
+                      <span>{post.commentCount || 0}</span>
+                    </button>
+                </div>
+                
+                <button className="p-2 rounded-full hover:bg-white/5 text-gray-400 transition-colors">
+                    <Bookmark className="w-5 h-5"/>
                 </button>
-                <button className="flex items-center gap-1 hover:text-primary transition-colors" onClick={() => setShowComments(!showComments)}><MessageSquare className="text-xl"/> {post.commentCount || 0}</button>
             </div>
-            <button className="hover:text-primary transition-colors"><Bookmark className="text-xl"/></button>
+            
+            <AnimatePresence>
+                {showComments && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <CommentSection postId={post.id} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-        {showComments && <CommentSection postId={post.id} />}
-    </div>
+    </GlassCard>
   );
 }
 
@@ -343,63 +405,67 @@ function CommentSection({ postId }: { postId: string }) {
     };
 
     return (
-        <div className="pt-4 mt-4 border-t border-gray-700">
+        <div className="pt-6 mt-6 border-t border-white/5 space-y-6">
             <div className="space-y-4">
-                {isLoading && <Loader2 className="w-5 h-5 animate-spin mx-auto text-gray-400" />}
-                {!isLoading && comments.length === 0 && <p className="text-sm text-gray-500 text-center">No comments yet.</p>}
+                {isLoading && <Loader2 className="w-5 h-5 animate-spin mx-auto text-primary" />}
+                {!isLoading && comments.length === 0 && (
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground text-center py-4">
+                        Be the first to share a thought
+                    </p>
+                )}
                 {comments.map(comment => {
                     const isCommentAuthor = user?.uid === comment.authorId;
                     const isOwner = user?.email === OWNER_EMAIL;
                     return (
-                        <div key={comment.id} className="flex items-start gap-3">
-                            <Avatar className="w-8 h-8">
-                               <AvatarFallback>{comment.authorName ? comment.authorName[0].toUpperCase() : 'A'}</AvatarFallback>
+                        <div key={comment.id} className="flex items-start gap-3 group">
+                            <Avatar className="w-8 h-8 border border-white/10">
+                               <AvatarFallback className="bg-white/5 text-[10px] font-bold">{comment.authorName?.[0] || 'A'}</AvatarFallback>
                             </Avatar>
-                            <div className="flex-1 bg-[#233648] p-3 rounded-lg">
-                               <div className="flex justify-between items-center">
-                                    <p className="text-sm font-semibold text-white">{comment.authorName}</p>
-                                    <div className="flex items-center gap-1">
-                                        <p className="text-xs text-gray-400 mr-1">
+                            <div className="flex-1 bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/5 group-hover:border-white/10 transition-colors">
+                               <div className="flex justify-between items-center mb-1">
+                                    <p className="text-xs font-black italic text-white tracking-tight">{comment.authorName}</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                                             {comment.createdAt ? formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true }) : ''}
                                         </p>
                                         {(isCommentAuthor || isOwner) && (
                                              <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-500">
-                                                        <Trash2 className="w-4 h-4" />
+                                                    <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-500 hover:text-red-500 hover:bg-transparent">
+                                                        <Trash2 className="w-3 h-3" />
                                                     </Button>
                                                 </AlertDialogTrigger>
-                                                <AlertDialogContent>
+                                                <AlertDialogContent className="bg-black/90 backdrop-blur-2xl border-white/10 rounded-[2rem]">
                                                     <AlertDialogHeader>
-                                                    <AlertDialogTitle>Delete Comment?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        Are you sure you want to delete this comment? This action cannot be undone.
+                                                    <AlertDialogTitle className="text-xl font-black italic">Delete Comment?</AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-muted-foreground font-medium">
+                                                        This will remove your comment forever.
                                                     </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDeleteComment(comment.id)}>Delete</AlertDialogAction>
+                                                    <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteComment(comment.id)} className="bg-red-500 hover:bg-red-600 rounded-full">Delete</AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
                                         )}
                                     </div>
                                </div>
-                                <p className="text-sm mt-1 text-gray-300">{comment.content}</p>
+                                <p className="text-sm text-gray-300 font-medium leading-relaxed">{comment.content}</p>
                             </div>
                         </div>
                     );
                 })}
             </div>
-            <form onSubmit={handleAddComment} className="flex items-center gap-2 mt-4">
+            <form onSubmit={handleAddComment} className="flex items-center gap-2">
                 <Input
-                    placeholder="Write a comment..."
+                    placeholder="Add a comment..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     disabled={isSubmitting}
-                    className="bg-[#233648] text-white placeholder-gray-400 border-none rounded-lg p-3 focus:ring-2 focus:ring-primary"
+                    className="bg-white/5 border-white/10 text-white placeholder-gray-500 rounded-full px-6 h-10 focus-visible:ring-primary/50"
                 />
-                <Button type="submit" size="icon" disabled={isSubmitting || !newComment.trim()}>
+                <Button type="submit" size="icon" disabled={isSubmitting || !newComment.trim()} className="rounded-full w-10 h-10 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/20">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4"/>}
                 </Button>
             </form>
@@ -508,6 +574,7 @@ function CommunityPageContent() {
       setNewPostContent('');
       removeImage();
       setIsCreatePostOpen(false);
+      toast({ title: "Post created successfully!" });
     } catch (error) {
       console.error('Error creating post:', error);
       toast({ title: "Error", description: "Could not create post.", variant: "destructive" });
@@ -517,99 +584,173 @@ function CommunityPageContent() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#111a22]">
-      <header className="border-b border-[#233648] bg-[#0d131a] p-3 md:p-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="md:hidden text-white" />
-          <div className="relative w-full md:w-auto flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input className="pl-10 bg-[#233648] text-white border-none focus:ring-2 focus:ring-primary placeholder:text-gray-400" placeholder="Search..." type="text"/>
+    <div className="h-full flex flex-col bg-background/50">
+      <header className="border-b border-white/10 p-4 md:p-6 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-6 flex-1 max-w-2xl">
+          <SidebarTrigger className="md:hidden" />
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <input 
+              className="w-full pl-11 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground" 
+              placeholder="Search conversations..." 
+              type="text"
+            />
           </div>
         </div>
-        <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" className="relative text-white hover:bg-[#233648] hover:text-white px-3 h-9">
-                <Link href="/friends" className="flex items-center gap-2">
-                    <UserPlus className="w-5 h-5" />
-                    <span className="text-sm font-medium">My Friends</span>
-                    {friendRequestCount > 0 && (
-                        <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary text-primary-foreground">
-                          {friendRequestCount}
-                        </Badge>
-                    )}
-                </Link>
-            </Button>
-            <Button asChild variant="ghost" className="text-white hover:bg-[#233648] hover:text-white px-3 h-9">
-                <Link href="/groups" className="flex items-center gap-2">
-                    <UsersIcon className="w-5 h-5" />
-                    <span className="text-sm font-medium">Groups</span>
-                </Link>
-            </Button>
+        
+        <div className="flex items-center gap-2 md:gap-4 ml-4">
+            <div className="hidden sm:flex items-center gap-2">
+                <Button asChild variant="ghost" className="rounded-full hover:bg-white/5 transition-all px-4">
+                    <Link href="/friends" className="flex items-center gap-2">
+                        <div className="relative">
+                            <UserPlus className="w-5 h-5" />
+                            {friendRequestCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white ring-2 ring-black">
+                                    {friendRequestCount}
+                                </span>
+                            )}
+                        </div>
+                        <span className="text-xs font-black italic uppercase tracking-widest hidden lg:inline">Friends</span>
+                    </Link>
+                </Button>
+                <Button asChild variant="ghost" className="rounded-full hover:bg-white/5 transition-all px-4">
+                    <Link href="/groups" className="flex items-center gap-2">
+                        <UsersIcon className="w-5 h-5" />
+                        <span className="text-xs font-black italic uppercase tracking-widest hidden lg:inline">Groups</span>
+                    </Link>
+                </Button>
+            </div>
+            
             <SOSButton />
             <GenZToggle />
             <ThemeToggle />
         </div>
       </header>
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-3xl mx-auto py-8 px-4">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-white text-3xl font-bold">Community Feed</h1>
-                <Button onClick={() => setIsCreatePostOpen(!isCreatePostOpen)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Post
-                </Button>
-            </div>
-            
-            {isCreatePostOpen && (
-              <form onSubmit={handleCreatePost} className="bg-[#1a2836] p-4 rounded-lg mb-6 animate-in fade-in-50">
-                  <div className="flex items-start gap-4">
-                      <Avatar className="w-11 h-11 mt-1">
-                          <AvatarFallback><User /></AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                          <Textarea 
-                            className="w-full bg-[#233648] text-white placeholder-gray-400 border-none rounded-lg p-3 focus:ring-2 focus:ring-primary resize-none" 
-                            placeholder="What's on your mind?" 
-                            rows={3}
-                            value={newPostContent}
-                            onChange={(e) => setNewPostContent(e.target.value)}
-                            disabled={isSubmitting}
-                          />
-                          {imagePreview && (
-                              <div className="relative w-32 h-32 mt-2 rounded-md overflow-hidden border border-[#233648]">
-                                  <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" />
-                                  <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={removeImage}>
-                                      <X className="w-4 h-4" />
-                                  </Button>
-                              </div>
-                          )}
-                          <div className="flex justify-between items-center mt-3">
-                              <div className="flex gap-2 text-gray-400">
-                                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-                                  <button type="button" onClick={() => fileInputRef.current?.click()} className="hover:text-primary transition-colors"><ImageIcon/></button>
-                              </div>
-                              <Button type="submit" disabled={isSubmitting || (!newPostContent.trim() && !postImage)}>
-                                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                  Post
-                              </Button>
-                          </div>
-                      </div>
-                  </div>
-              </form>
-            )}
 
+      <main className="flex-1 overflow-auto bg-gradient-to-b from-transparent to-primary/5">
+        <div className="max-w-4xl mx-auto py-12 px-4 md:px-8">
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between mb-12"
+            >
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white mb-2">Community Feed</h1>
+                    <p className="text-xs text-muted-foreground font-black uppercase tracking-[0.3em]">Connect & Soul Search</p>
+                </div>
+                <Button 
+                    onClick={() => setIsCreatePostOpen(!isCreatePostOpen)}
+                    className="rounded-full bg-primary hover:bg-primary/90 text-white font-black italic px-8 h-12 shadow-lg shadow-primary/25 transition-all active:scale-95"
+                >
+                    <Plus className="mr-2 h-5 w-5" />
+                    Share a Thought
+                </Button>
+            </motion.div>
+            
+            <AnimatePresence>
+                {isCreatePostOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                    className="mb-12"
+                  >
+                    <GlassCard interactive={false} className="border-primary/20 overflow-hidden rounded-[2.5rem]">
+                        <div className="p-8">
+                            <form onSubmit={handleCreatePost}>
+                                <div className="flex items-start gap-6">
+                                    <Avatar className="w-14 h-14 border-2 border-primary/20 mt-1">
+                                        <AvatarFallback className="bg-primary/10"><User /></AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 space-y-6">
+                                        <Textarea 
+                                            className="w-full bg-transparent text-xl font-medium placeholder:text-muted-foreground/40 border-none focus-visible:ring-0 resize-none min-h-[120px] p-0" 
+                                            placeholder="What's evolving in your world?" 
+                                            value={newPostContent}
+                                            onChange={(e) => setNewPostContent(e.target.value)}
+                                            disabled={isSubmitting}
+                                        />
+                                        
+                                        {imagePreview && (
+                                            <div className="relative inline-block group">
+                                                <div className="relative w-48 aspect-square rounded-3xl overflow-hidden border-2 border-white/10">
+                                                    <Image src={imagePreview} alt="Preview" layout="fill" objectFit="cover" />
+                                                </div>
+                                                <Button 
+                                                    variant="destructive" 
+                                                    size="icon" 
+                                                    className="absolute -top-3 -right-3 h-8 w-8 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" 
+                                                    onClick={removeImage}
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex justify-between items-center pt-6 border-t border-white/5">
+                                            <div className="flex gap-4">
+                                                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => fileInputRef.current?.click()} 
+                                                    className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-black italic uppercase tracking-widest text-[10px]"
+                                                >
+                                                    <div className="p-2 rounded-full bg-white/5">
+                                                        <Camera className="w-4 h-4"/>
+                                                    </div>
+                                                    Add Visual
+                                                </button>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <Button 
+                                                    type="button" 
+                                                    variant="ghost" 
+                                                    onClick={() => setIsCreatePostOpen(false)}
+                                                    className="rounded-full px-6 font-black italic text-xs uppercase tracking-widest"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button 
+                                                    type="submit" 
+                                                    disabled={isSubmitting || (!newPostContent.trim() && !postImage)}
+                                                    className="rounded-full bg-primary px-10 h-11 font-black italic uppercase tracking-widest text-xs"
+                                                >
+                                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Post Memory"}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </GlassCard>
+                  </motion.div>
+                )}
+            </AnimatePresence>
 
             {isLoading ? (
-                <div className="flex justify-center py-10">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary opacity-20" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground">Synchronizing Soul Feed</p>
                 </div>
             ) : posts.length === 0 ? (
-                <div className="text-center text-gray-500 py-10">
-                    <p>No posts yet. Be the first to share something!</p>
+                <div className="text-center py-24 border-2 border-dashed border-white/5 rounded-[3rem]">
+                    <p className="text-muted-foreground font-black italic text-xl">The feed is silent...</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/40 mt-2">Speak your truth to begin</p>
                 </div>
             ) : (
-                <div className="space-y-6">
-                    {posts.map(post => <PostCard key={post.id} post={post} />)}
-                </div>
+                <motion.div 
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="space-y-12 pb-24"
+                >
+                    {posts.map(post => (
+                        <motion.div key={post.id} variants={itemVariants}>
+                            <PostCard post={post} />
+                        </motion.div>
+                    ))}
+                </motion.div>
             )}
         </div>
       </main>

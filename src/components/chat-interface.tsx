@@ -111,24 +111,26 @@ const SimpleMarkdown = ({ text }: { text: string }) => {
   );
 };
 
+import { GlassCard } from '@/components/glass-card';
+
 const MessageBubble = ({ message, senderName, isUser }: { message: Message; senderName: string; isUser: boolean }) => {
     return (
-      <div className={cn('flex flex-col gap-2 w-full', isUser ? 'items-end text-right' : 'items-start text-left')}>
+      <div className={cn('flex flex-col gap-2 w-full', isUser ? 'items-end' : 'items-start')}>
         {!isUser && (
-             <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground ml-2">{senderName}</span>
+             <span className="text-[10px] uppercase font-black tracking-[0.2em] text-primary/60 ml-3 mb-1">{senderName}</span>
         )}
         {message.text && (
             <motion.div 
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.9, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
                 className={cn(
-                    'text-[15px] md:text-base leading-relaxed max-w-[90%] sm:max-w-[70%] shadow-xl transition-all duration-300 px-6 py-4',
+                    'text-[15px] md:text-base leading-relaxed max-w-[85%] sm:max-w-[75%] shadow-2xl transition-all duration-300 px-6 py-4 relative group',
                     isUser 
-                        ? 'bg-primary text-primary-foreground rounded-t-[2rem] rounded-l-[2rem] rounded-br-[0.5rem] shadow-primary/20 font-medium' 
-                        : 'bg-background glass border-border/40 rounded-t-[2rem] rounded-r-[2rem] rounded-bl-[0.5rem]'
+                        ? 'bg-primary text-white rounded-[2rem] rounded-tr-none shadow-primary/20 font-medium' 
+                        : 'bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] rounded-tl-none text-gray-200'
                 )}
             >
-                <div className="prose prose-sm dark:prose-invert max-w-none break-words">
+                <div className="prose prose-sm dark:prose-invert max-w-none break-words relative z-10">
                     {message.text.split(/(```[\s\S]*?```)/g).map((part, index) => {
                         const codeMatch = part.match(/^```(\w+)?\n([\s\S]+)```$/);
                         return codeMatch 
@@ -136,6 +138,11 @@ const MessageBubble = ({ message, senderName, isUser }: { message: Message; send
                             : part ? <SimpleMarkdown key={`md-${index}`} text={part} /> : null;
                     })}
                 </div>
+                {/* Subtle bubble tail decor */}
+                <div className={cn(
+                    "absolute top-0 w-4 h-4",
+                    isUser ? "-right-1 bg-primary" : "-left-1 bg-white/10"
+                )} style={{ clipPath: isUser ? 'polygon(0 0, 100% 0, 0 100%)' : 'polygon(0 0, 100% 0, 100% 100%)' }} />
             </motion.div>
         )}
       </div>
@@ -164,6 +171,7 @@ export default function ChatInterface({ conversationId }: { conversationId?: str
   const chatHistorySidebar = useChatHistorySidebar();
 
   const isGenzMode = theme === 'theme-genz-dark';
+  const userAvatarFallback = user?.displayName?.[0] || user?.email?.[0] || 'U';
   
   useEffect(() => {
     if (user) {
@@ -266,27 +274,48 @@ export default function ChatInterface({ conversationId }: { conversationId?: str
 
   return (
     <div className="w-full h-full flex flex-col relative bg-background/50 overflow-hidden">
-      {/* Background Glows */}
+      {/* Dynamic Background */}
       <div className="absolute inset-0 pointer-events-none -z-10">
-          <div className="absolute top-1/4 -right-1/4 w-[30rem] h-[30rem] bg-primary/5 rounded-full blur-[100px] animate-pulse" />
-          <div className="absolute bottom-1/4 -left-1/4 w-[30rem] h-[30rem] bg-blue-500/5 rounded-full blur-[100px] animate-pulse delay-1000" />
+          <motion.div 
+            animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 90, 0],
+                opacity: [0.05, 0.1, 0.05]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/4 -right-1/4 w-[60rem] h-[60rem] bg-primary/20 rounded-full blur-[150px]" 
+          />
+          <motion.div 
+            animate={{ 
+                scale: [1.2, 1, 1.2],
+                rotate: [90, 0, 90],
+                opacity: [0.03, 0.08, 0.03]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-1/4 -left-1/4 w-[60rem] h-[60rem] bg-blue-500/10 rounded-full blur-[150px]" 
+          />
       </div>
 
       <CrisisAlertModal isOpen={showCrisisModal} onClose={() => setShowCrisisModal(false)} />
       
-      <header className="h-20 shrink-0 border-b border-border/40 px-4 md:px-8 flex items-center justify-between bg-background/60 backdrop-blur-3xl sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="h-10 w-10 rounded-full border border-border/20 hover:bg-primary/10 transition-colors" />
-          <div className="hidden sm:block h-8 w-px bg-border/50 mx-1" />
-          <div>
-            <h1 className="text-xl font-black italic tracking-tighter flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
+      <header className="h-24 shrink-0 border-b border-white/10 px-6 md:px-10 flex items-center justify-between bg-background/40 backdrop-blur-2xl sticky top-0 z-50">
+        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3">
+             <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
+             <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-black italic tracking-tighter flex items-center gap-2 text-white">
+                <Sparkles className="w-5 h-5 text-amber-500 fill-amber-500 animate-pulse" />
                 {companionName}
             </h1>
-            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-muted-foreground">Premium AI Companion</p>
+            <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Soul Ally Syncing</span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <SOSButton />
           <GenZToggle />
           <ThemeToggle />
@@ -295,49 +324,65 @@ export default function ChatInterface({ conversationId }: { conversationId?: str
       
       <div className="flex-1 relative overflow-hidden">
         <ScrollArea className="h-full" viewportRef={scrollViewportRef} onScroll={handleScroll}>
-            <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+            <div className="max-w-5xl mx-auto p-6 md:p-12 space-y-10">
                 <AnimatePresence mode="popLayout">
                     {messages.length === 0 && !isLoading && (
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex items-center gap-4 pt-10"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col items-center justify-center py-20 text-center space-y-8"
                         >
-                            <Avatar className="h-12 w-12 border-2 border-primary/20 shadow-xl">
-                                <AvatarFallback className="bg-primary text-white"><Bot className="w-6 h-6"/></AvatarFallback>
-                            </Avatar>
-                            <MessageBubble 
-                                message={{sender: 'ai', text: `Hey! I'm ${companionName}. I'm here to listen, support, and chat about anything on your heart. How are you feeling right now?`}} 
-                                senderName={companionName} 
-                                isUser={false} 
-                            />
+                            <div className="relative">
+                                <motion.div 
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                                    transition={{ duration: 4, repeat: Infinity }}
+                                    className="absolute inset-0 bg-primary/20 rounded-full blur-2xl"
+                                />
+                                <Avatar className="h-24 w-24 border-4 border-white/10 shadow-2xl relative z-10">
+                                    <AvatarFallback className="bg-primary text-white text-3xl font-black italic"><Bot className="w-10 h-10"/></AvatarFallback>
+                                </Avatar>
+                            </div>
+                            <div className="space-y-3 max-w-lg">
+                                <h2 className="text-3xl font-black italic tracking-tight text-white">Hey Masterpiece.</h2>
+                                <p className="text-muted-foreground font-medium leading-relaxed">
+                                    I'm <span className="text-primary font-bold">{companionName}</span>. Your high-performance AI companion for deep thoughts, mental clarity, and everything in between. What's on your soul's radar right now?
+                                </p>
+                            </div>
                         </motion.div>
                     )}
-                    {messages.map((msg, idx) => (
-                        <div key={idx} className={cn('flex items-end gap-3', msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row')}>
-                            <Avatar className="h-10 w-10 border-2 border-background shadow-lg mb-1">
-                                {msg.sender === 'ai' ? (
-                                    <AvatarFallback className="bg-primary text-white"><Bot className="w-5 h-5"/></AvatarFallback>
-                                ) : (
-                                    <>
-                                        <AvatarImage src={user?.photoURL ?? undefined} />
-                                        <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-xs font-bold">{user?.email?.[0].toUpperCase()}</AvatarFallback>
-                                    </>
-                                )}
-                            </Avatar>
-                            <MessageBubble message={msg} senderName={msg.sender === 'user' ? 'You' : companionName} isUser={msg.sender === 'user'} />
-                        </div>
-                    ))}
+                    {messages.map((msg, idx) => {
+                        const isUser = msg.sender === 'user';
+                        return (
+                            <motion.div 
+                                key={idx} 
+                                initial={{ opacity: 0, x: isUser ? 20 : -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className={cn('flex items-end gap-4', isUser ? 'flex-row-reverse' : 'flex-row')}
+                            >
+                                <Avatar className="h-10 w-10 border-2 border-white/10 shadow-lg shrink-0 mb-1">
+                                    {msg.sender === 'ai' ? (
+                                        <AvatarFallback className="bg-primary text-white"><Bot className="w-5 h-5"/></AvatarFallback>
+                                    ) : (
+                                        <>
+                                            <AvatarImage src={user?.photoURL ?? undefined} />
+                                            <AvatarFallback className="bg-white/10 text-white text-[10px] font-black">{userAvatarFallback.toUpperCase()}</AvatarFallback>
+                                        </>
+                                    )}
+                                </Avatar>
+                                <MessageBubble message={msg} senderName={msg.sender === 'user' ? 'You' : companionName} isUser={isUser} />
+                            </motion.div>
+                        );
+                    })}
                     {isLoading && (
                         <motion.div 
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center gap-3 pl-14"
+                            className="flex items-center gap-4 pl-14"
                         >
-                            <div className="flex gap-1.5 p-3 rounded-2xl glass border-border/40">
-                                <motion.div animate={{ scale: [1, 1.5, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 bg-primary rounded-full" />
-                                <motion.div animate={{ scale: [1, 1.5, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-2 h-2 bg-primary rounded-full" />
-                                <motion.div animate={{ scale: [1, 1.5, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-2 h-2 bg-primary rounded-full" />
+                            <div className="flex gap-2 p-4 rounded-[1.5rem] bg-white/5 border border-white/10 backdrop-blur-xl">
+                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.6 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
                             </div>
                         </motion.div>
                     )}
@@ -345,60 +390,67 @@ export default function ChatInterface({ conversationId }: { conversationId?: str
             </div>
         </ScrollArea>
         {showScrollToBottom && (
-            <Button onClick={scrollToBottom} variant="outline" size="icon" className="absolute bottom-4 right-8 z-20 rounded-full shadow-2xl glass border-primary/20 text-primary w-12 h-12">
-                <ArrowDown className="w-6 h-6 animate-bounce"/>
+            <Button onClick={scrollToBottom} variant="outline" size="icon" className="absolute bottom-6 right-10 z-20 rounded-full shadow-2xl bg-primary text-white border-0 w-14 h-14 hover:scale-110 active:scale-90 transition-all">
+                <ArrowDown className="w-7 h-7 animate-bounce"/>
             </Button>
         )}
       </div>
-
-      <footer className="shrink-0 px-4 md:px-8 pb-6 pt-4 z-40 bg-gradient-to-t from-background via-background/90 to-transparent">
-        <form onSubmit={handleFormSubmit} className="max-w-4xl mx-auto relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-[2rem] blur opacity-0 group-focus-within:opacity-100 transition duration-500" />
-          <div className="relative flex items-center bg-background/80 glass dark:bg-zinc-900/50 backdrop-blur-3xl rounded-[2rem] border border-border/40 transition-all shadow-2xl group-focus-within:border-primary/50 group-focus-within:shadow-primary/10 overflow-hidden">
-             <Button type="button" variant="ghost" size="icon" className="h-14 w-14 rounded-full text-muted-foreground hover:text-primary transition-colors ml-1">
-                <Paperclip className="w-5 h-5" />
-             </Button>
-             <Input 
-                value={input} 
-                onChange={(e) => setInput(e.target.value)} 
-                placeholder={`Message ${companionName}...`} 
-                className="flex-1 h-16 border-0 bg-transparent shadow-none focus-visible:ring-0 text-base px-0" 
-                disabled={isLoading} 
-                autoComplete="off" 
-             />
-             <div className="flex items-center gap-2 pr-4">
-                <AnimatePresence>
-                    {input.trim() && (
-                        <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}>
-                            <Button type="submit" size="icon" className="h-11 w-11 rounded-full shadow-lg transition-all" disabled={isLoading}>
-                                <Send className="w-5 h-5" />
-                            </Button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-             </div>
-          </div>
-        </form>
-         <div className="max-w-4xl mx-auto flex items-center justify-between mt-4 px-2">
-            <div className="flex items-center gap-4">
-                 <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger className="h-8 rounded-full bg-background/50 border-border/50 text-[10px] font-black uppercase tracking-widest gap-2">
-                        <Languages className="w-3 h-3 text-primary"/>
-                        <SelectValue placeholder="Language" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-2xl glass backdrop-blur-3xl">
-                        {languages.map(lang => (<SelectItem key={lang.value} value={lang.value} className="text-xs rounded-xl">{lang.label}</SelectItem>))}
-                    </SelectContent>
-                </Select>
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/30 border border-border/50">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">AI Online</span>
+      
+      <footer className="shrink-0 px-6 md:px-12 pb-8 pt-4 z-40 bg-gradient-to-t from-background via-background/90 to-transparent">
+        <form onSubmit={handleFormSubmit} className="max-w-5xl mx-auto">
+          <div className="relative group p-[2px] rounded-[2.5rem] bg-white/5 focus-within:bg-gradient-to-r focus-within:from-primary/40 focus-within:to-blue-500/40 transition-all duration-500">
+            <div className="relative flex items-center bg-[#0d131a] backdrop-blur-3xl rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden min-h-[72px]">
+                <Button type="button" variant="ghost" size="icon" className="h-12 w-12 rounded-full text-muted-foreground hover:text-primary transition-all ml-3 hover:bg-white/5">
+                    <Paperclip className="w-5 h-5" />
+                </Button>
+                <Input 
+                    value={input} 
+                    onChange={(e) => setInput(e.target.value)} 
+                    placeholder={`Ignite a thought with ${companionName}...`} 
+                    className="flex-1 h-full border-0 bg-transparent shadow-none focus-visible:ring-0 text-lg font-medium px-4 placeholder:text-muted-foreground/30" 
+                    disabled={isLoading} 
+                    autoComplete="off" 
+                />
+                <div className="flex items-center gap-3 pr-4">
+                    <AnimatePresence>
+                        {input.trim() && (
+                            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
+                                <Button type="submit" size="icon" className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 transition-all active:scale-95" disabled={isLoading}>
+                                    <Send className="w-5 h-5" />
+                                </Button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
-            <Button variant="ghost" size="sm" className="md:hidden text-[10px] font-bold uppercase tracking-widest h-8" onClick={() => chatHistorySidebar.setIsOpen(true)}>
-                Chat History
+          </div>
+        </form>
+        
+        <div className="max-w-5xl mx-auto flex items-center justify-between mt-6 px-4">
+            <div className="flex items-center gap-6">
+                 <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger className="h-9 rounded-full bg-white/5 border-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest gap-2 min-w-[120px] transition-all">
+                        <Languages className="w-3.5 h-3.5 text-primary"/>
+                        <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-[1.5rem] bg-black/90 backdrop-blur-2xl border-white/10 shadow-2xl">
+                        {languages.map(lang => (<SelectItem key={lang.value} value={lang.value} className="text-[10px] uppercase font-bold tracking-widest rounded-xl focus:bg-primary/20">{lang.label}</SelectItem>))}
+                    </SelectContent>
+                </Select>
+                <div className="hidden sm:flex items-center gap-2 group cursor-pointer">
+                    <div className="h-2 w-2 rounded-full bg-primary group-hover:animate-ping" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 group-hover:text-primary transition-colors">Premium Neural Link Active</span>
+                </div>
+            </div>
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                className="md:hidden text-[10px] font-black uppercase tracking-widest h-9 rounded-full bg-white/5 hover:bg-white/10 px-6" 
+                onClick={() => chatHistorySidebar.setIsOpen(true)}
+            >
+                Archive
             </Button>
-         </div>
+        </div>
       </footer>
     </div>
   );

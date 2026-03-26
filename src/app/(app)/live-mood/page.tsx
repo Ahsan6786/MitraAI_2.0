@@ -21,9 +21,47 @@ import { db } from '@/lib/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { ToastAction } from '@/components/ui/toast';
+import { GlassCard } from '@/components/glass-card';
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+interface SpeechRecognitionEvent extends Event {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  onerror: (event: any) => void;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
 
 const SpeechRecognition =
-  (typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition));
+  typeof window !== 'undefined' 
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+    : null;
 
 interface ChatMessage {
     sender: 'user' | 'ai';
@@ -54,22 +92,20 @@ export default function LiveMoodPage() {
     const scrollViewportRef = useRef<HTMLDivElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
 
-    // Auto-scroll to bottom of chat
     useEffect(() => {
         if (scrollViewportRef.current) {
           scrollViewportRef.current.scrollTo({ top: scrollViewportRef.current.scrollHeight, behavior: 'smooth' });
         }
-    }, [chatMessages]);
+    }, [chatMessages, isProcessing]);
     
-    // Setup and cleanup camera
     useEffect(() => {
         const getCameraPermission = async () => {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 setHasCameraPermission(false);
                 toast({
                     variant: 'destructive',
-                    title: 'Media Devices Not Supported',
-                    description: 'Your browser does not support camera access.',
+                    title: 'System Incompatibility',
+                    description: 'Your neural interface does not support visual input standard.',
                 });
                 return;
             }
@@ -85,8 +121,8 @@ export default function LiveMoodPage() {
                 setHasCameraPermission(false);
                 toast({
                     variant: 'destructive',
-                    title: 'Camera Access Denied',
-                    description: 'Please enable camera permissions to use this feature.',
+                    title: 'Input Blocked',
+                    description: 'Please authorize visual sensor access for mood calibration.',
                 });
             }
         };
@@ -130,7 +166,7 @@ export default function LiveMoodPage() {
         setChatMessages(prev => [...prev, userMessage]);
 
         if (!photoDataUri) {
-            toast({ title: 'Could not capture frame', variant: 'destructive' });
+            toast({ title: 'Sensor Failure', description: 'Could not capture visual data.', variant: 'destructive' });
             setIsProcessing(false);
             return;
         }
@@ -143,7 +179,7 @@ export default function LiveMoodPage() {
                 if (!userDoc.exists()) throw "User document does not exist!";
                 
                 const currentTokens = userDoc.data().tokens || 0;
-                if (currentTokens < TOKEN_COST) throw new Error("Insufficient tokens.");
+                if (currentTokens < TOKEN_COST) throw new Error("Insufficient neural energy.");
 
                 transaction.update(userDocRef, { tokens: increment(-TOKEN_COST) });
             });
@@ -151,35 +187,34 @@ export default function LiveMoodPage() {
             const result = await predictLiveMood({ photoDataUri, description: transcript, language });
             const aiMessage: ChatMessage = { sender: 'ai', text: result.response };
             setChatMessages(prev => [...prev, aiMessage]);
-            toast({ title: `${TOKEN_COST} tokens used.`});
+            toast({ title: 'Transaction Confirmed', description: `${TOKEN_COST} energy units utilized.`});
 
         } catch (error: any) {
             console.error('Error predicting live mood:', error);
-            const errorMessage: ChatMessage = { sender: 'ai', text: "Sorry, I couldn't process that right now." };
+            const errorMessage: ChatMessage = { sender: 'ai', text: "Spectral interference detected. Initialization failed." };
             setChatMessages(prev => [...prev, errorMessage]);
 
-            if (error.message.includes("Insufficient tokens")) {
+            if (error.message.includes("Insufficient neural energy")) {
                  toast({
-                    title: "Insufficient Tokens",
-                    description: "Please ask your doctor for a recharge.",
+                    title: "Energy Depleted",
+                    description: "Consult your technical specialist for a core recharge.",
                     variant: "destructive",
-                    action: <ToastAction altText="Message Doctor" onClick={() => router.push('/reports')}>Message Doctor</ToastAction>,
+                    action: <ToastAction altText="Contact" onClick={() => router.push('/reports')}>Contact Tech</ToastAction>,
                 });
             } else {
-                toast({ title: 'AI Analysis Failed', description: error.message, variant: 'destructive' });
+                toast({ title: 'AI Calibration Error', description: error.message, variant: 'destructive' });
             }
         } finally {
              setIsProcessing(false);
-             // After AI responds, wait 0.5s and then listen again.
              setTimeout(() => {
                 startListeningRef.current?.();
-             }, 500);
+             }, 800);
         }
     }, [language, toast, user, router]);
     
     const startListening = useCallback(() => {
         if (!SpeechRecognition) {
-            toast({ title: 'Browser Not Supported', variant: 'destructive' });
+            toast({ title: 'Interface Unsupported', description: 'Speech matrix not found.', variant: 'destructive' });
             return;
         }
         if (isRecording || isProcessing) return;
@@ -188,7 +223,7 @@ export default function LiveMoodPage() {
         const recognition = new SpeechRecognition();
         recognitionRef.current = recognition;
         
-        recognition.continuous = false; // Process after a single utterance
+        recognition.continuous = false;
         recognition.interimResults = false;
         recognition.lang = languageToSpeechCode[language] || 'en-US';
         
@@ -203,7 +238,7 @@ export default function LiveMoodPage() {
 
         recognition.onerror = (event: any) => {
             if (event.error !== 'aborted' && event.error !== 'no-speech') {
-                toast({ title: 'Speech recognition error', description: `Error: ${event.error}`, variant: 'destructive' });
+                toast({ title: 'Receiver Error', description: `Noise interference: ${event.error}`, variant: 'destructive' });
             }
             setIsRecording(false);
         };
@@ -211,7 +246,6 @@ export default function LiveMoodPage() {
         recognition.start();
     }, [isRecording, isProcessing, language, toast, processMood]);
 
-    // Use a ref to hold the startListening function to break circular dependency
     const startListeningRef = useRef(startListening);
     useEffect(() => {
         startListeningRef.current = startListening;
@@ -233,27 +267,46 @@ export default function LiveMoodPage() {
     };
 
     return (
-        <div className="h-full flex flex-col">
-            <header className="border-b p-3 md:p-4 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                    <SidebarTrigger className="md:hidden" />
-                    <div>
-                        <h1 className="text-lg md:text-xl font-bold">Live Mood Analysis</h1>
-                        <p className="text-sm text-muted-foreground">Each analysis costs ${TOKEN_COST} tokens.</p>
+        <div className="h-full flex flex-col relative bg-background/50 overflow-hidden">
+            {/* Spectral Background Blobs */}
+            <div className="absolute inset-0 pointer-events-none -z-10">
+                <motion.div 
+                    animate={{ 
+                        scale: isRecording ? [1, 1.4, 1] : [1, 1.2, 1],
+                        opacity: isRecording ? [0.05, 0.15, 0.05] : [0.03, 0.08, 0.03],
+                        rotate: [0, 180, 360]
+                    }}
+                    transition={{ duration: isRecording ? 5 : 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70rem] h-[70rem] bg-primary/20 rounded-full blur-[180px]" 
+                />
+            </div>
+
+            <header className="h-24 shrink-0 px-6 md:px-10 border-b border-white/10 flex items-center justify-between bg-background/40 backdrop-blur-3xl sticky top-0 z-50">
+                <div className="flex items-center gap-5">
+                    <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
+                    <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
+                    <div className="flex flex-col">
+                        <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">Spectrum</h1>
+                        <div className="flex items-center gap-2">
+                             <div className={cn("w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(var(--primary),0.8)]", isRecording ? "bg-rose-500 animate-ping" : "bg-primary animate-pulse")} />
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">{isRecording ? 'Sensor Monitoring' : 'Live Uplink Active'}</span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Select value={language} onValueChange={setLanguage} disabled={isRecording || isProcessing}>
-                        <SelectTrigger className="w-[120px]">
-                            <Languages className="w-4 h-4 mr-2"/>
-                            <SelectValue placeholder="Language" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="English">English</SelectItem>
-                            <SelectItem value="Hindi">Hindi</SelectItem>
-                            <SelectItem value="Hinglish">Hinglish</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-4">
+                    <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
+                        <Languages className="w-4 h-4 text-primary/60" />
+                        <Select value={language} onValueChange={setLanguage} disabled={isRecording || isProcessing}>
+                            <SelectTrigger className="w-[100px] border-none bg-transparent h-6 p-0 focus:ring-0 text-[10px] font-black uppercase tracking-widest text-white">
+                                <SelectValue placeholder="Protocol" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-black/90 backdrop-blur-3xl border-white/10 rounded-xl overflow-hidden shadow-2xl">
+                                <SelectItem value="English" className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/20">English</SelectItem>
+                                <SelectItem value="Hindi" className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/20">Hindi</SelectItem>
+                                <SelectItem value="Hinglish" className="text-[10px] font-black uppercase tracking-widest focus:bg-primary/20">Hinglish</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <SOSButton />
                     <GenZToggle />
                     <ThemeToggle />
@@ -261,75 +314,215 @@ export default function LiveMoodPage() {
             </header>
 
              <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                {/* Left Side: Camera View */}
-                <div className="w-full lg:w-1/2 p-2 sm:p-4 flex flex-col">
-                    <Card className="flex-1 flex flex-col">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Camera className="w-5 h-5 text-primary" />
-                                Your Camera
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-grow flex items-center justify-center p-2 sm:p-4 md:p-6">
-                            <div className="relative w-full max-w-md aspect-video bg-muted rounded-md overflow-hidden">
-                                <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                {/* Left Side: Neural Optic Sensor */}
+                <div className="w-full lg:w-[45%] p-6 flex flex-col min-h-[400px]">
+                    <GlassCard className="flex-1 flex flex-col rounded-[2.5rem] relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 pointer-events-none" />
+                        
+                        <div className="p-8 flex items-center justify-between relative z-10 border-b border-white/5">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                                    <Camera className="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80">Optical Relay</p>
+                                    <p className="text-xl font-black italic text-white tracking-tightest">Vision <span className="text-primary italic">Matrix.</span></p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                <span className="text-[9px] font-black text-white/40 tracking-widest uppercase">HD STREAM</span>
+                            </div>
+                        </div>
+
+                        <CardContent className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
+                            <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden border border-white/10 group-hover:border-primary/30 transition-all duration-500 shadow-2xl">
+                                <video ref={videoRef} className="w-full h-full object-cover scale-[1.05]" autoPlay muted playsInline />
+                                
+                                {/* HUD Overlay */}
+                                <div className="absolute inset-0 pointer-events-none">
+                                    <div className="absolute top-6 left-6 w-12 h-12 border-t-2 border-l-2 border-primary/40 rounded-tl-xl" />
+                                    <div className="absolute top-6 right-6 w-12 h-12 border-t-2 border-r-2 border-primary/40 rounded-tr-xl" />
+                                    <div className="absolute bottom-6 left-6 w-12 h-12 border-b-2 border-l-2 border-primary/40 rounded-bl-xl" />
+                                    <div className="absolute bottom-6 right-6 w-12 h-12 border-b-2 border-r-2 border-primary/40 rounded-br-xl" />
+                                    
+                                    <AnimatePresence>
+                                        {(isRecording || isProcessing) && (
+                                            <motion.div 
+                                                initial={{ top: '0%' }}
+                                                animate={{ top: '100%' }}
+                                                transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
+                                                className="absolute left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_15px_rgba(var(--primary),0.8)] z-10"
+                                            />
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+
                                 {hasCameraPermission === false && (
-                                    <div className="absolute inset-0 flex items-center justify-center p-4">
-                                        <Alert variant="destructive">
-                                            <AlertTitle>Camera Access Required</AlertTitle>
-                                            <AlertDescription>
-                                                Please allow camera access in your browser to use this feature.
-                                            </AlertDescription>
-                                        </Alert>
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-xl p-10 text-center">
+                                        <div className="space-y-6">
+                                            <div className="p-6 rounded-full bg-rose-500/10 border border-rose-500/20 w-fit mx-auto">
+                                                <Camera className="w-12 h-12 text-rose-500" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-2xl font-black italic tracking-tight text-white uppercase">Sensor offline</h3>
+                                                <p className="text-muted-foreground font-medium text-sm">Please authorize spectral optic access for neural calibration.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
                         </CardContent>
-                    </Card>
+                    </GlassCard>
                 </div>
                 
-                {/* Right Side: Chat and Controls */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-                     <ScrollArea className="flex-1" viewportRef={scrollViewportRef}>
-                        <div className="p-2 sm:p-4 md:p-6 space-y-4">
-                            {chatMessages.length === 0 && !isProcessing && (
-                                <div className="flex flex-col items-center justify-center h-full text-center py-10">
-                                    <Bot className="w-12 h-12 text-muted-foreground mb-4" />
-                                    <p className="text-muted-foreground">The AI is waiting for you to speak.</p>
+                {/* Right Side: Neural Chat Uplink */}
+                <div className="flex-1 flex flex-col p-6 space-y-6">
+                    <GlassCard className="flex-1 flex flex-col rounded-[2.5rem] relative overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex items-center justify-between">
+                             <div className="flex items-center gap-4">
+                                <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+                                    <Bot className="w-5 h-5 text-primary" />
                                 </div>
-                            )}
-                            {chatMessages.map((msg, index) => (
-                                <div key={index} className={cn('flex items-start gap-3', msg.sender === 'user' ? 'justify-end' : 'justify-start')}>
-                                    {msg.sender === 'ai' && <Avatar><AvatarFallback><Bot /></AvatarFallback></Avatar>}
-                                    <p className={cn('max-w-[80%] rounded-xl px-4 py-3 text-sm shadow-sm', msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
-                                        {msg.text}
-                                    </p>
-                                    {msg.sender === 'user' && <Avatar><AvatarFallback>{user?.email?.[0].toUpperCase() ?? <User />}</AvatarFallback></Avatar>}
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80">Cognitive Link</p>
+                                    <p className="text-xl font-black italic text-white tracking-tightest">Soul <span className="text-primary italic">Ally.</span></p>
                                 </div>
-                            ))}
-                            {isProcessing && chatMessages[chatMessages.length - 1]?.sender === 'user' && (
-                                <div className="flex items-start gap-3 justify-start">
-                                    <Avatar><AvatarFallback><Bot /></AvatarFallback></Avatar>
-                                    <div className="bg-muted rounded-xl px-4 py-3 text-sm shadow-sm flex items-center">
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2"/> Thinking...
-                                    </div>
-                                </div>
-                            )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Cost: 10E</span>
+                            </div>
                         </div>
-                    </ScrollArea>
-                    <footer className="border-t p-4 text-center bg-background">
-                        <Button
-                            onClick={handleMicClick}
-                            disabled={hasCameraPermission !== true || isProcessing}
-                            size="lg"
-                            variant={isRecording ? 'destructive' : 'default'}
-                            className="rounded-full w-20 h-20 sm:w-24 sm:h-24 shadow-lg"
-                        >
-                            {isRecording ? <Square className="w-8 h-8 sm:w-10 sm:h-10" /> : <Mic className="w-8 h-8 sm:w-10 sm:h-10" />}
-                        </Button>
-                        <p className="text-sm text-muted-foreground mt-2">
-                            {isRecording ? 'Listening...' : (isProcessing ? 'Processing...' : 'Tap to Speak')}
-                        </p>
+
+                        <ScrollArea className="flex-1" viewportRef={scrollViewportRef}>
+                            <div className="p-8 space-y-8">
+                                <AnimatePresence initial={false}>
+                                    {chatMessages.length === 0 && !isProcessing && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex flex-col items-center justify-center py-20 text-center space-y-8"
+                                        >
+                                            <div className="relative">
+                                                <motion.div 
+                                                    animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+                                                    transition={{ duration: 10, repeat: Infinity }}
+                                                    className="absolute inset-0 bg-primary/10 rounded-3xl blur-2xl" 
+                                                />
+                                                <div className="relative p-8 bg-white/5 border border-white/10 rounded-[2rem]">
+                                                    <Bot className="w-16 h-16 text-primary shadow-2xl" />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-2xl font-black italic tracking-tight text-white uppercase">Uplink Ready</h3>
+                                                <p className="text-muted-foreground/60 font-medium text-sm max-w-xs uppercase tracking-widest leading-loose">State your frequency or project your intention into the matrix.</p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {chatMessages.map((msg, index) => (
+                                        <motion.div 
+                                            key={index} 
+                                            initial={{ opacity: 0, x: msg.sender === 'user' ? 20 : -20, filter: 'blur(10px)' }}
+                                            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                                            className={cn('flex items-start gap-4', msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row')}
+                                        >
+                                            <Avatar className="h-10 w-10 mt-1 border border-white/10 rounded-xl">
+                                                <AvatarFallback className="bg-white/5 font-black text-xs uppercase italic">
+                                                    {msg.sender === 'ai' ? <Bot className="w-5 h-5 text-primary" /> : (user?.email?.[0].toUpperCase() ?? 'U')}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className={cn(
+                                                'relative max-w-[80%] rounded-[1.5rem] px-6 py-4 shadow-xl border',
+                                                msg.sender === 'user' 
+                                                    ? 'bg-white text-black border-white font-medium self-end italic' 
+                                                    : 'bg-white/5 text-white border-white/10 backdrop-blur-sm self-start leading-relaxed'
+                                            )}>
+                                                {msg.text}
+                                                <div className={cn(
+                                                    "absolute top-4 w-4 h-4 rotate-45 border-r border-b",
+                                                    msg.sender === 'user' 
+                                                        ? "-right-1.5 bg-white border-white" 
+                                                        : "-left-1.5 bg-white/5 border-white/10"
+                                                )} />
+                                            </div>
+                                        </motion.div>
+                                    ))}
+
+                                    {isProcessing && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            className="flex items-start gap-4"
+                                        >
+                                            <Avatar className="h-10 w-10 mt-1 border border-white/10 rounded-xl bg-white/5 flex items-center justify-center">
+                                                <Bot className="w-5 h-5 text-primary animate-pulse" />
+                                            </Avatar>
+                                            <div className="bg-primary/10 border border-primary/20 rounded-[1.5rem] px-6 py-4 flex items-center gap-3">
+                                                <div className="flex gap-1.5">
+                                                    {[0, 1, 2].map(i => (
+                                                        <motion.div 
+                                                            key={i}
+                                                            animate={{ y: [0, -5, 0] }}
+                                                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                                                            className="w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary),0.8)]"
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">Calibrating...</span>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </ScrollArea>
+                    </GlassCard>
+
+                    <footer className="flex flex-col items-center gap-6 pt-4">
+                        <div className="relative group">
+                            <AnimatePresence>
+                                {isRecording && (
+                                    <motion.div 
+                                        initial={{ scale: 0.8, opacity: 0 }}
+                                        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+                                        exit={{ scale: 0.8, opacity: 0 }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                        className="absolute -inset-8 bg-rose-500 rounded-full blur-3xl pointer-events-none" 
+                                    />
+                                )}
+                            </AnimatePresence>
+                            
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handleMicClick}
+                                disabled={hasCameraPermission !== true || isProcessing}
+                                className={cn(
+                                    "relative z-10 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl border-[6px]",
+                                    isRecording 
+                                        ? "bg-rose-500 border-rose-400/20 text-white" 
+                                        : "bg-white border-white/10 text-black hover:bg-white/90"
+                                )}
+                            >
+                                {isRecording ? <Square className="w-10 h-10 fill-current" /> : <Mic className="w-12 h-12" />}
+                            </motion.button>
+                        </div>
+                        
+                        <div className="flex flex-col items-center gap-1.5">
+                            <span className={cn(
+                                "text-[10px] font-black uppercase tracking-[0.4em] transition-colors duration-500",
+                                isRecording ? "text-rose-400" : (isProcessing ? "text-primary" : "text-white/40")
+                            )}>
+                                {isRecording ? 'STREAMING ACTIVE' : (isProcessing ? 'CALIBRATING MATRIX' : 'INITIALIZE UPLINK')}
+                            </span>
+                            {!isRecording && !isProcessing && <div className="h-1 w-24 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div 
+                                    animate={{ left: ['-100%', '100%'] }}
+                                    transition={{ duration: 3, repeat: Infinity }}
+                                    className="relative w-1/2 h-full bg-primary/40 rounded-full" 
+                                />
+                            </div>}
+                        </div>
                     </footer>
                 </div>
             </main>

@@ -51,6 +51,24 @@ interface Message {
     createdAt: Timestamp;
 }
 
+import { motion, Variants, AnimatePresence } from 'framer-motion';
+import { GlassCard } from '@/components/glass-card';
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+};
+
 const ReportCard = ({ report }: { report: Report }) => {
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -63,12 +81,12 @@ const ReportCard = ({ report }: { report: Report }) => {
         }
 
         const canvas = await html2canvas(reportElement, {
-            scale: 2, // Higher scale for better quality
+            scale: 2,
             useCORS: true,
         });
         const imgData = canvas.toDataURL('image/png');
 
-        const pdf = new jsPDF('p', 'mm', 'a4'); // Standard A4 page
+        const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         
@@ -79,7 +97,6 @@ const ReportCard = ({ report }: { report: Report }) => {
         let finalPdfWidth = pdfWidth;
         let finalPdfHeight = pdfWidth / canvasAspectRatio;
 
-        // If the calculated height is greater than the page height, scale down
         if (finalPdfHeight > pdfHeight) {
             finalPdfHeight = pdfHeight;
             finalPdfWidth = pdfHeight * canvasAspectRatio;
@@ -94,91 +111,139 @@ const ReportCard = ({ report }: { report: Report }) => {
     };
     
     const title = report.type === 'journal' 
-        ? `Journal Report - ${report.createdAt.toDate().toLocaleDateString()}` 
-        : `${report.testName} Report - ${report.createdAt.toDate().toLocaleDateString()}`;
+        ? `Journal Recovery Report` 
+        : `${report.testName} Assessment`;
+
+    const dateStr = report.createdAt.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     return (
-        <Card className="bg-[#1A1E24] text-white border-gray-700">
-             {/* This off-screen div is used for PDF generation */}
+        <GlassCard interactive={false} className="border-white/10 overflow-hidden shadow-2xl rounded-[2.5rem]">
+             {/* PDF Export Template */}
             <div 
               id={`report-${report.id}`} 
-              style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '800px', background: '#1A1E24', color: 'white' }}
+              className="absolute -left-[9999px] w-[800px] bg-[#0d131a] text-white p-12"
             >
-                <div className="p-8">
-                    <div className="flex items-center gap-3 mb-8">
-                       <Logo className="w-10 h-10 text-primary"/>
-                       <h1 className="text-2xl font-bold">MitraAI Wellness Report</h1>
-                    </div>
-                    <h2 className="text-xl font-bold">{title}</h2>
-                    <p className="text-sm text-gray-400">Generated on: {new Date().toLocaleDateString()}</p>
-                    <div className="mt-6 space-y-6">
-                        {report.type === 'journal' ? (
-                            <>
-                                <div>
-                                    <h3 className="text-lg font-semibold">Your Entry (Mood: {report.mood})</h3>
-                                    <p className="mt-2 text-gray-300 italic">"{report.content}"</p>
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold">Doctor's Feedback</h3>
-                                    <p className="mt-2 text-gray-300 whitespace-pre-wrap">{report.doctorReport}</p>
-                                </div>
-                            </>
-                        ) : (
-                             <>
-                                <div>
-                                    <h3 className="text-lg font-semibold">Initial Assessment (Score: {report.score})</h3>
-                                    {report.result && <p className="mt-2 text-gray-300"><strong>{report.result.level}:</strong> {report.result.recommendation}</p>}
-                                </div>
-                                 <div>
-                                    <h3 className="text-lg font-semibold">Doctor's Feedback</h3>
-                                    <p className="mt-2 text-gray-300 whitespace-pre-wrap">{report.doctorFeedback}</p>
-                                </div>
-                            </>
-                        )}
-                    </div>
+                <div className="flex items-center gap-4 mb-12 border-b border-white/10 pb-8">
+                   <Logo className="w-12 h-12 text-primary"/>
+                   <div>
+                        <h1 className="text-3xl font-black italic tracking-tighter">MitraAI Premium</h1>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Certified Wellness Report</p>
+                   </div>
+                </div>
+                <div className="mb-12">
+                    <h2 className="text-4xl font-black italic tracking-tight mb-2">{title}</h2>
+                    <p className="text-sm font-bold text-primary uppercase tracking-widest">Released: {dateStr}</p>
+                </div>
+                <div className="space-y-10">
+                    {report.type === 'journal' ? (
+                        <>
+                            <div className="bg-white/5 p-8 rounded-3xl border border-white/5">
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Patient Narrative</h3>
+                                <p className="text-xl font-medium italic leading-relaxed text-gray-200">"{report.content}"</p>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-4">Professional Analysis</h3>
+                                <div className="text-lg leading-relaxed text-gray-300 whitespace-pre-wrap">{report.doctorReport}</div>
+                            </div>
+                        </>
+                    ) : (
+                         <>
+                            <div className="bg-white/5 p-8 rounded-3xl border border-white/5">
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Assessment Metrics</h3>
+                                {report.result && <p className="text-2xl font-black italic text-white"><span className="text-primary">{report.result.level}:</span> {report.result.recommendation}</p>}
+                                <p className="text-sm font-bold text-muted-foreground mt-2">Quantitative Score: {report.score}</p>
+                            </div>
+                             <div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-4">Clinical Guidance</h3>
+                                <div className="text-lg leading-relaxed text-gray-300 whitespace-pre-wrap">{report.doctorFeedback}</div>
+                            </div>
+                        </>
+                    )}
+                </div>
+                <div className="mt-20 pt-8 border-t border-white/5 text-center">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-muted-foreground/40">Confidential Soul Ally Assessment • {new Date().getFullYear()}</p>
                 </div>
             </div>
 
-            {/* This is the visible card content */}
-            <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="p-8 md:p-10">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10 pb-8 border-b border-white/5">
                     <div>
-                        <CardTitle className="tracking-tight text-xl md:text-2xl">{title}</CardTitle>
-                        <CardDescription className="text-gray-400 mt-1">Generated on: {report.createdAt.toDate().toLocaleDateString()}</CardDescription>
+                        <div className="flex items-center gap-2 mb-2">
+                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Verified Report</span>
+                        </div>
+                        <h3 className="text-3xl font-black italic tracking-tighter text-white">{title}</h3>
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2">Archived on {dateStr}</p>
                     </div>
-                    <Button onClick={handleDownloadPdf} disabled={isDownloading} className="w-full md:w-auto">
-                        {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Download className="mr-2 h-4 w-4"/>}
-                        Download PDF
+                    <Button 
+                        onClick={handleDownloadPdf} 
+                        disabled={isDownloading} 
+                        className="rounded-full bg-primary hover:bg-primary/90 text-white font-black italic px-8 h-12 shadow-xl shadow-primary/20 transition-all active:scale-95"
+                    >
+                        {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Download className="mr-2 h-5 w-5"/>}
+                        Export PDF
                     </Button>
                 </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                 {report.type === 'journal' && (
-                    <>
-                        <div>
-                            <h3 className="text-lg font-semibold flex items-center gap-2"><PenSquare className="w-5 h-5"/>Your Entry</h3>
-                             <p className="mt-2 text-gray-400 italic p-4 bg-black/20 rounded-md">"{report.content}"</p>
-                        </div>
-                         <div>
-                            <h3 className="text-lg font-semibold">Doctor's Feedback</h3>
-                            <p className="mt-2 text-gray-300 list-disc space-y-2 pl-6 whitespace-pre-wrap">{report.doctorReport}</p>
-                        </div>
-                    </>
-                )}
-                {report.type === 'questionnaire' && (
-                     <>
-                        <div>
-                            <h3 className="text-lg font-semibold flex items-center gap-2"><FileQuestion className="w-5 h-5"/>Initial Assessment</h3>
-                             {report.result && <p className="mt-2 text-gray-400 p-4 bg-black/20 rounded-md"><strong>{report.result.level}:</strong> {report.result.recommendation}</p>}
-                        </div>
-                         <div>
-                            <h3 className="text-lg font-semibold">Doctor's Feedback</h3>
-                            <p className="mt-2 text-gray-300 list-disc space-y-2 pl-6 whitespace-pre-wrap">{report.doctorFeedback}</p>
-                        </div>
-                    </>
-                )}
-            </CardContent>
-        </Card>
+                
+                <div className="grid gap-10 lg:grid-cols-2">
+                     {report.type === 'journal' ? (
+                        <>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                                    <PenSquare className="w-4 h-4"/>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Self Reflection</span>
+                                </div>
+                                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 relative overflow-hidden group">
+                                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                        <MessageSquare className="w-12 h-12" />
+                                     </div>
+                                     <p className="text-lg font-medium italic text-gray-300 leading-relaxed relative z-10">"{report.content}"</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-primary mb-2">
+                                    <FileText className="w-4 h-4"/>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Specialist Insights</span>
+                                </div>
+                                <div className="p-2 space-y-4">
+                                    <p className="text-gray-200 font-medium leading-relaxed whitespace-pre-wrap">{report.doctorReport}</p>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                         <>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                                    <FileQuestion className="w-4 h-4"/>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Initial Assessment</span>
+                                </div>
+                                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5">
+                                     {report.result && (
+                                        <div className="space-y-2">
+                                            <p className="text-2xl font-black italic text-white tracking-tight">{report.result.level}</p>
+                                            <p className="text-sm font-medium text-gray-400 leading-relaxed">{report.result.recommendation}</p>
+                                        </div>
+                                     )}
+                                     <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between">
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Score index</span>
+                                        <span className="text-xl font-black italic text-primary">{report.score}</span>
+                                     </div>
+                                </div>
+                            </div>
+                             <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-primary mb-2">
+                                    <FileText className="w-4 h-4"/>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Doctor Feedback</span>
+                                </div>
+                                <div className="p-2">
+                                    <p className="text-gray-200 font-medium leading-relaxed whitespace-pre-wrap">{report.doctorFeedback}</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </GlassCard>
     );
 };
 
@@ -219,35 +284,85 @@ function UserMessages() {
     };
 
     return (
-        <Card className="bg-[#1A1E24] text-white border-gray-700 mt-8">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><MessageSquare />Messages from Your Doctor</CardTitle>
-                <CardDescription className="text-gray-400">Communicate directly with your doctor.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col h-[60vh]">
-                <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
-                    <div className="space-y-4">
-                        {isLoading && <Loader2 className="mx-auto w-6 h-6 animate-spin" />}
-                        {messages.map(msg => (
-                            <div key={msg.id} className={cn('flex items-start gap-3', msg.senderId !== ADMIN_UID ? 'justify-end' : 'justify-start')}>
-                                {msg.senderId === ADMIN_UID && <Avatar className="w-8 h-8 border"><AvatarFallback>A</AvatarFallback></Avatar>}
-                                <div className={cn("flex flex-col max-w-[70%]", msg.senderId !== ADMIN_UID ? 'items-end' : 'items-start')}>
-                                    <div className={cn('rounded-xl px-4 py-2 text-sm shadow-sm', msg.senderId !== ADMIN_UID ? 'bg-primary text-primary-foreground' : 'bg-black/20')}>
-                                        {msg.text}
-                                    </div>
-                                </div>
-                                {msg.senderId !== ADMIN_UID && <Avatar className="w-8 h-8 border"><AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback></Avatar>}
-                            </div>
-                        ))}
-                         {messages.length === 0 && !isLoading && <p className="text-center text-gray-500">No messages yet. The doctor will message you here.</p>}
+        <GlassCard interactive={false} className="border-white/10 mt-16 rounded-[3rem] overflow-hidden shadow-2xl">
+            <div className="p-8 md:p-10">
+                <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                            <MessageSquare className="w-6 h-6" />
+                        </div>
+                        <div>
+                             <h3 className="text-2xl font-black italic tracking-tight text-white">Soul Specialist Chat</h3>
+                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Direct Clinical Communication</p>
+                        </div>
                     </div>
-                </ScrollArea>
-                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-4 border-t border-gray-700">
-                    <Input value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your reply..." className="bg-black/20 border-gray-600 text-white" />
-                    <Button type="submit" size="icon"><Send className="w-4 h-4" /></Button>
-                </form>
-            </CardContent>
-        </Card>
+                </div>
+                
+                <div className="flex flex-col h-[500px]">
+                    <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
+                        <div className="space-y-6 pb-4">
+                            {isLoading && (
+                                <div className="flex justify-center p-8">
+                                    <Loader2 className="w-8 h-8 animate-spin text-primary/20" />
+                                </div>
+                            )}
+                            {messages.map((msg, idx) => {
+                                const isMe = msg.senderId !== ADMIN_UID;
+                                return (
+                                    <motion.div 
+                                        key={msg.id} 
+                                        initial={{ opacity: 0, x: isMe ? 20 : -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className={cn('flex items-end gap-3', isMe ? 'justify-end' : 'justify-start')}
+                                    >
+                                        {!isMe && (
+                                            <Avatar className="w-10 h-10 border-2 border-primary/20 bg-background">
+                                                <AvatarFallback className="text-primary font-black">DR</AvatarFallback>
+                                            </Avatar>
+                                        )}
+                                        <div className={cn(
+                                            "max-w-[80%] rounded-3xl p-4 text-sm font-medium leading-relaxed shadow-lg",
+                                            isMe ? "bg-primary text-white rounded-br-none" : "bg-white/5 text-gray-200 border border-white/10 rounded-bl-none"
+                                        )}>
+                                            {msg.text}
+                                            <div className={cn(
+                                                "text-[8px] font-black uppercase mt-2 opacity-40",
+                                                isMe ? "text-right" : "text-left"
+                                            )}>
+                                                {msg.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                        {isMe && (
+                                            <Avatar className="w-10 h-10 border-2 border-primary/20 bg-background">
+                                                <AvatarFallback className="text-primary font-black">{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                                            </Avatar>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                             {messages.length === 0 && !isLoading && (
+                                <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground/30">
+                                    <MessageSquare className="w-12 h-12 mb-4 opacity-10" />
+                                    <p className="text-xs font-black uppercase tracking-widest">No messages currently archived</p>
+                                </div>
+                             )}
+                        </div>
+                    </ScrollArea>
+                    
+                    <form onSubmit={handleSendMessage} className="flex items-center gap-3 pt-6 border-t border-white/5">
+                        <Input 
+                            value={newMessage} 
+                            onChange={(e) => setNewMessage(e.target.value)} 
+                            placeholder="Address your specialist..." 
+                            className="flex-1 bg-white/5 border-white/10 rounded-full px-6 h-12 text-sm font-medium focus-visible:ring-primary/40 focus:bg-white/10 transition-all" 
+                        />
+                        <Button type="submit" size="icon" className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20">
+                            <Send className="w-5 h-5" />
+                        </Button>
+                    </form>
+                </div>
+            </div>
+        </GlassCard>
     );
 }
 
@@ -296,53 +411,72 @@ export default function ReportsPage() {
     }, [user]);
 
     return (
-        <div className="h-full flex flex-col bg-muted/20">
-            <header className="border-b p-3 md:p-4 flex items-center justify-between gap-2 bg-background">
-                <div className="flex items-center gap-2">
+        <div className="h-full flex flex-col bg-background/50">
+            <header className="border-b border-white/10 p-4 md:p-6 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
+                <div className="flex items-center gap-4">
                     <SidebarTrigger className="md:hidden" />
                     <div>
-                      <h1 className="text-lg md:text-xl font-bold">Doctor's Reports</h1>
-                      <p className="text-sm text-muted-foreground">
-                          View professional feedback on your submissions.
-                      </p>
+                      <h1 className="text-xl md:text-2xl font-black italic tracking-tight">Nexus Reports</h1>
+                      <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">Expert Clinical Oversight</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <SOSButton />
                     <GenZToggle />
                     <ThemeToggle />
                 </div>
             </header>
-            <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6 lg:p-12">
-                <div className="max-w-4xl mx-auto">
-                     <div className="mb-10">
-                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Professional Insights</h1>
-                        <p className="mt-2 text-lg text-muted-foreground">View confidential reports and insights from our team of professionals.</p>
-                    </div>
+            
+            <main className="flex-1 overflow-auto bg-gradient-to-b from-transparent to-primary/5">
+                <div className="max-w-5xl mx-auto px-4 py-12 md:py-20">
+                     <motion.div 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-16 text-center lg:text-left"
+                    >
+                        <h1 className="text-5xl md:text-6xl font-black italic tracking-tighter text-white mb-4">Professional Insights</h1>
+                        <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed">
+                            A secure archive of your journey's milestones, reviewed & certified by our clinical elite.
+                        </p>
+                    </motion.div>
+                    
                     {isLoading ? (
-                        <div className="flex justify-center items-center py-10">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                            <Loader2 className="w-12 h-12 animate-spin text-primary opacity-20" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground">Authenticating Nexus Feed</p>
                         </div>
                     ) : reports.length === 0 ? (
-                        <Card className="w-full text-center bg-card">
-                             <CardHeader>
-                                <div className="mx-auto bg-muted rounded-full p-4 w-fit mb-4">
-                                    <FileText className="w-12 h-12 text-primary" />
-                                </div>
-                                <CardTitle>No Reports Yet</CardTitle>
-                                <CardDescription>
-                                    Once a doctor reviews your journal entries or questionnaires, the reports will appear here.
-                                </CardDescription>
-                            </CardHeader>
+                        <Card className="w-full text-center bg-black/40 border-dashed border-white/10 rounded-[3rem] p-16">
+                            <div className="mx-auto bg-primary/10 rounded-full p-6 w-fit mb-8 border border-primary/20">
+                                <FileText className="w-12 h-12 text-primary" />
+                            </div>
+                            <h3 className="text-2xl font-black italic text-white mb-2">No Reports Published</h3>
+                            <p className="text-muted-foreground font-medium max-w-sm mx-auto">
+                                Once our specialists review your journey milestones, your certified reports will materialize here.
+                            </p>
                         </Card>
                     ) : (
-                        <div className="space-y-8">
+                        <motion.div 
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="show"
+                            className="space-y-12"
+                        >
                             {reports.map(report => (
-                                <ReportCard key={report.id} report={report} />
+                                <motion.div key={report.id} variants={itemVariants}>
+                                    <ReportCard report={report} />
+                                </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     )}
-                    <UserMessages />
+                    
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        <UserMessages />
+                    </motion.div>
                 </div>
             </main>
         </div>

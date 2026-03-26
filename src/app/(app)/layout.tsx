@@ -69,10 +69,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const hasSeenFeatureHint = sessionStorage.getItem('hasSeenFeatureHint');
     if (!hasSeenFeatureHint && !isMobile) {
-      const timer = setTimeout(() => {
-        setShowFeatureHint(true);
-      }, 2000); // Show after 2 seconds
-      return () => clearTimeout(timer);
+        const timer = setTimeout(() => {
+            setShowFeatureHint(true);
+        }, 2000); // Show after 2 seconds
+        return () => clearTimeout(timer);
     }
   }, [isMobile]);
 
@@ -97,19 +97,19 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && user) {
-      const checkUserType = async () => {
-        if (user.email === ADMIN_EMAIL) {
-          setUserType('admin');
-          return;
-        }
-        const counsellorDoc = await getDoc(doc(db, 'counsellors', user.uid));
-        if (counsellorDoc.exists() && counsellorDoc.data().status === 'approved') {
-          setUserType('counsellor');
-          return;
-        }
-        setUserType('user');
-      };
-      checkUserType();
+        const checkUserType = async () => {
+            if (user.email === ADMIN_EMAIL) {
+                setUserType('admin');
+                return;
+            }
+            const counsellorDoc = await getDoc(doc(db, 'counsellors', user.uid));
+            if (counsellorDoc.exists() && counsellorDoc.data().status === 'approved') {
+                setUserType('counsellor');
+                return;
+            }
+            setUserType('user');
+        };
+        checkUserType();
     }
   }, [user, loading, router, pathname]);
 
@@ -117,9 +117,9 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
     await signOut(auth);
     // Redirect to the appropriate sign-in page
     if (pathname.startsWith('/counsellor')) {
-      router.push('/counsellor-signin');
+        router.push('/counsellor-signin');
     } else {
-      router.push('/signin');
+        router.push('/signin');
     }
   };
 
@@ -139,7 +139,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   }
 
   if (timeLimitExceeded) {
-    return <TimeUpScreen />;
+      return <TimeUpScreen />;
   }
 
   const userDisplayName = user.displayName || user.email;
@@ -149,25 +149,25 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Sidebar className="border-r border-border/40 bg-sidebar/40 backdrop-blur-3xl overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px]" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-[80px]" />
-        </div>
-        <SidebarHeader className="border-b border-border/20 pb-6 mb-2 relative z-10 px-4 pt-6">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="bg-primary p-2 rounded-2xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
-                <Logo className="h-5 w-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-black italic tracking-tightest leading-none">MitraAI</span>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">Premium AI</span>
-              </div>
-            </Link>
-            {userType === 'user' && <UsageTracker />}
+          <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px]" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-[80px]" />
           </div>
-        </SidebarHeader>
-        <SidebarContent className="px-3 relative z-10">
+          <SidebarHeader className="border-b border-border/20 pb-6 mb-2 relative z-10 px-4 pt-6">
+            <div className="flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="bg-primary p-2 rounded-2xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
+                  <Logo className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-2xl font-black italic tracking-tightest leading-none">MitraAI</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">Premium AI</span>
+                </div>
+              </Link>
+              {userType === 'user' && <UsageTracker />}
+            </div>
+          </SidebarHeader>
+          <SidebarContent className="px-3 relative z-10">
           <SidebarMenu>
             {userType === 'admin' && (
               <SidebarMenuItem>
@@ -208,14 +208,14 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     <Link href="/talk" onClick={handleLinkClick} className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
                         <Phone />
-
+                        <span>Talk to Mitra</span>
                       </div>
                       <Trophy className="w-4 h-4 text-amber-500" />
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-
-                <SidebarMenuItem>
+                
+                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith('/culture')}>
                     <Link href="/culture" onClick={handleLinkClick} className="flex items-center justify-between w-full">
                       <div className="flex items-center gap-2">
@@ -226,10 +226,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith('/community') || pathname.startsWith('/groups') || pathname.startsWith('/friends')}>
                     <Link href="/community" onClick={handleLinkClick} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
+                       <div className="flex items-center gap-2">
                         <Users />
                         <span>Community</span>
                       </div>
@@ -237,7 +237,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-
+                
                 {/* Professional Help Section */}
                 <Collapsible open={isProfessionalHelpOpen} onOpenChange={setIsProfessionalHelpOpen}>
                   <CollapsibleTrigger asChild>
@@ -323,7 +323,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
-
+                
                 {/* Rest of the items */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
@@ -333,7 +333,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/news'}>
                     <Link href="/news" onClick={handleLinkClick}>
                       <Newspaper />
@@ -357,7 +357,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === '/mindful-games'}
@@ -368,7 +368,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/rewards'}>
                     <Link href="/rewards" onClick={handleLinkClick}>
                       <Trophy />
@@ -376,7 +376,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === '/about'}
@@ -393,33 +393,33 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="border-t border-border/20 p-4 relative z-10">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-4 p-3 rounded-[1.5rem] bg-background/40 border border-border/20 shadow-sm">
-              <Avatar className="h-10 w-10 border-2 border-background shadow-md">
-                <AvatarImage src={user.photoURL ?? undefined} />
-                <AvatarFallback className="font-bold bg-primary text-white">{userAvatarFallback.toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col overflow-hidden">
-                <span className="text-sm font-black italic tracking-tight truncate">{userDisplayName}</span>
-                {userType === 'user' && userTokens !== null && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
-                    <Coins className="w-3 h-3 text-amber-500 animate-pulse" />
-                    <span>{userTokens} Tokens</span>
-                  </div>
-                )}
+             <div className="flex items-center gap-4 p-3 rounded-[1.5rem] bg-background/40 border border-border/20 shadow-sm">
+                <Avatar className="h-10 w-10 border-2 border-background shadow-md">
+                  <AvatarImage src={user.photoURL ?? undefined} />
+                  <AvatarFallback className="font-bold bg-primary text-white">{userAvatarFallback.toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-sm font-black italic tracking-tight truncate">{userDisplayName}</span>
+                  {userType === 'user' && userTokens !== null && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
+                        <Coins className="w-3 h-3 text-amber-500 animate-pulse"/>
+                        <span>{userTokens} Tokens</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="ghost" size="sm" asChild className="rounded-full justify-start h-10 px-4 hover:bg-primary/10 hover:text-primary transition-all">
-                <Link href="/profile" onClick={handleLinkClick}>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleSignOut} className="rounded-full justify-start h-10 px-4 hover:bg-destructive/10 hover:text-destructive transition-all">
-                <LogOut className="mr-2 h-4 w-4" />
-                Exit
-              </Button>
-            </div>
+              <div className="grid grid-cols-2 gap-2">
+                  <Button variant="ghost" size="sm" asChild className="rounded-full justify-start h-10 px-4 hover:bg-primary/10 hover:text-primary transition-all">
+                      <Link href="/profile" onClick={handleLinkClick}>
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={handleSignOut} className="rounded-full justify-start h-10 px-4 hover:bg-destructive/10 hover:text-destructive transition-all">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Exit
+                  </Button>
+              </div>
           </div>
         </SidebarFooter>
       </Sidebar>
@@ -429,47 +429,47 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             <div className="flex-1">
               {children}
             </div>
-            { /* Floating button container */}
+            { /* Floating button container */ }
             <div className="fixed bottom-6 left-4 z-50 flex flex-col items-start gap-3">
-              <div className="flex items-center gap-3">
-                <ThemeToggle open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen} />
-                <Button
-                  onClick={() => setIsThemeMenuOpen(true)}
-                  className="rounded-full shadow-lg h-12 bg-primary text-primary-foreground hidden md:flex"
-                >
-                  <Palette className="h-5 w-5 mr-2" />
-                  Customize!
-                </Button>
-              </div>
-              <div className="flex items-center gap-3">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => sidebar?.setOpenMobile(true)}
-                        size="icon"
-                        className="rounded-full shadow-lg h-12 w-12 hidden md:flex"
-                      >
-                        <Menu className="h-6 w-6" />
-                        <span className="sr-only">Explore Features</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Explore Features</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                {showFeatureHint && !isMobile && (
-                  <div
-                    className="flex items-center gap-2 bg-primary text-primary-foreground rounded-full p-2 pr-4 shadow-lg cursor-pointer animate-in fade-in-50"
-                    onClick={handleHintClick}
+                <div className="flex items-center gap-3">
+                  <ThemeToggle open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen} />
+                  <Button
+                    onClick={() => setIsThemeMenuOpen(true)}
+                    className="rounded-full shadow-lg h-12 bg-primary text-primary-foreground hidden md:flex"
                   >
-                    <ArrowRight className="h-5 w-5 animate-point-right" />
-                    <span className="text-sm font-medium">Explore Features</span>
-                  </div>
-                )}
-              </div>
+                    <Palette className="h-5 w-5 mr-2" />
+                    Customize!
+                  </Button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <TooltipProvider>
+                      <Tooltip>
+                          <TooltipTrigger asChild>
+                                <Button 
+                                onClick={() => sidebar?.setOpenMobile(true)}
+                                size="icon"
+                                className="rounded-full shadow-lg h-12 w-12 hidden md:flex"
+                              >
+                                <Menu className="h-6 w-6"/>
+                                <span className="sr-only">Explore Features</span>
+                              </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="right">
+                              <p>Explore Features</p>
+                          </TooltipContent>
+                      </Tooltip>
+                  </TooltipProvider>
+
+                  {showFeatureHint && !isMobile && (
+                      <div 
+                          className="flex items-center gap-2 bg-primary text-primary-foreground rounded-full p-2 pr-4 shadow-lg cursor-pointer animate-in fade-in-50"
+                          onClick={handleHintClick}
+                      >
+                          <ArrowRight className="h-5 w-5 animate-point-right" />
+                          <span className="text-sm font-medium">Explore Features</span>
+                      </div>
+                  )}
+                </div>
             </div>
           </div>
         </SidebarInset>
@@ -481,12 +481,12 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <SidebarProvider>
-        <ChatHistoryProvider>
-          <AppLayoutContent>{children}</AppLayoutContent>
-        </ChatHistoryProvider>
-      </SidebarProvider>
+     <AuthProvider>
+        <SidebarProvider>
+            <ChatHistoryProvider>
+              <AppLayoutContent>{children}</AppLayoutContent>
+            </ChatHistoryProvider>
+        </SidebarProvider>
     </AuthProvider>
   );
 }

@@ -262,96 +262,148 @@ function TalkPageContent() {
   }, []);
 
   const getStatusText = () => {
-    if (isRecording) return "Mitra is listening...";
-    if (isLoading) return "Mitra is processing...";
-    if (chatHistory.length > 0) return "Say something more...";
-    return "Tap to start your journey.";
+    if (isRecording) return "Listening to your soul...";
+    if (isLoading) return "Analyzing neural pathways...";
+    if (chatHistory.length > 0) return "Continue the flow...";
+    return "Tap to ignite the connection.";
   }
+
+  const userAvatarFallback = user?.displayName?.[0] || user?.email?.[0] || 'U';
 
   return (
     <div className="relative h-svh flex flex-col bg-background/50 overflow-hidden">
-      {/* Animated Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none -z-10">
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] animate-pulse delay-700" />
+      {/* Dynamic Background Blobs */}
+      <div className="absolute inset-0 pointer-events-none -z-10">
+          <motion.div 
+            animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 90, 0],
+                opacity: [0.05, 0.1, 0.05]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/4 -right-1/4 w-[60rem] h-[60rem] bg-primary/20 rounded-full blur-[150px]" 
+          />
+          <motion.div 
+            animate={{ 
+                scale: [1.2, 1, 1.2],
+                rotate: [90, 0, 90],
+                opacity: [0.03, 0.08, 0.03]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-1/4 -left-1/4 w-[60rem] h-[60rem] bg-blue-500/10 rounded-full blur-[150px]" 
+          />
       </div>
 
       <CrisisAlertModal isOpen={showCrisisModal} onClose={() => setShowCrisisModal(false)} />
 
-      <header className="h-20 shrink-0 px-4 md:px-8 border-b border-border/40 flex items-center justify-between bg-background/60 backdrop-blur-3xl sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="hover:bg-primary/10 transition-colors h-11 w-11 rounded-full border border-border/20" />
+      <header className="h-24 shrink-0 px-6 md:px-10 border-b border-white/10 flex items-center justify-between bg-background/40 backdrop-blur-3xl sticky top-0 z-50">
+        <div className="flex items-center gap-5">
+          <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
+          <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-black italic tracking-tighter flex items-center gap-2 text-white">
+                <Phone className="w-5 h-5 text-primary fill-primary/20 animate-pulse" />
+                Soul Sync
+            </h1>
+            <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Audio Uplink Active</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Select value={language} onValueChange={setLanguage} disabled={isRecording || isLoading}>
-            <SelectTrigger className="rounded-full bg-background/50 border-border/50 h-10 w-auto gap-2 px-4 hover:border-primary/50 transition-all">
+            <SelectTrigger className="h-10 rounded-full bg-white/5 border-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest gap-2 min-w-[120px] transition-all">
               <Languages className="w-4 h-4 text-primary" />
               <SelectValue placeholder="Language" />
             </SelectTrigger>
-            <SelectContent className="rounded-2xl border-border/50 backdrop-blur-3xl bg-background/80">
+            <SelectContent className="rounded-[1.5rem] bg-black/90 backdrop-blur-2xl border-white/10 shadow-2xl">
               {languages.map(lang => (
-                <SelectItem key={lang.value} value={lang.value} className="rounded-xl">{lang.label}</SelectItem>
+                <SelectItem key={lang.value} value={lang.value} className="text-[10px] uppercase font-bold tracking-widest rounded-xl focus:bg-primary/20">{lang.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <GenZToggle />
-          <ThemeToggle />
+          <div className="hidden sm:flex gap-3">
+            <GenZToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col relative overflow-hidden px-4 md:px-8">
-        <ScrollArea className="flex-1 py-8" viewportRef={scrollViewportRef}>
-          <div className="max-w-3xl mx-auto space-y-6">
+      <main className="flex-1 flex flex-col relative overflow-hidden px-6 md:px-12">
+        <ScrollArea className="flex-1 py-10" viewportRef={scrollViewportRef}>
+          <div className="max-w-4xl mx-auto space-y-10">
             <AnimatePresence mode="popLayout">
               {chatHistory.length === 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-20"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-24 text-center space-y-8"
                 >
-                  <div className="bg-primary/10 p-6 rounded-[3rem] w-fit mx-auto mb-12 shadow-2xl shadow-primary/10">
-                    <Bot className="w-16 h-16 text-primary" />
+                  <div className="relative">
+                    <motion.div 
+                        animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+                        transition={{ duration: 5, repeat: Infinity }}
+                        className="absolute inset-0 bg-primary/20 rounded-full blur-[40px]"
+                    />
+                    <div className="bg-[#0d131a] p-8 rounded-[3rem] border border-white/10 relative z-10 shadow-2xl">
+                        <Bot className="w-20 h-20 text-primary opacity-80" />
+                    </div>
+                  </div>
+                  <div className="space-y-4 max-w-lg">
+                    <h2 className="text-4xl font-black italic tracking-tight text-white">Voice your soul.</h2>
+                    <p className="text-muted-foreground font-medium text-lg leading-relaxed">
+                        Step into a zero-latency empathetic space. I'm here to listen to your voice, your emotions, and your journey.
+                    </p>
                   </div>
                 </motion.div>
               )}
 
-              {chatHistory.map((msg, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: msg.sender === 'user' ? 20 : -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className={cn('flex items-end gap-3', msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row')}
-                >
-                  <Avatar className="h-10 w-10 border-2 border-background shadow-lg">
-                    {msg.sender === 'ai' ? (
-                      <AvatarFallback className="bg-primary text-white"><Bot className="w-5 h-5" /></AvatarFallback>
-                    ) : (
-                      <>
-                        <AvatarImage src={user?.photoURL ?? undefined} />
-                        <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800 text-xs font-bold">{user?.email?.[0].toUpperCase()}</AvatarFallback>
-                      </>
-                    )}
-                  </Avatar>
-                  <div className={cn(
-                    'max-w-[85%] sm:max-w-[70%] px-6 py-4 text-sm md:text-base shadow-xl transition-all duration-300',
-                    msg.sender === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-t-[2rem] rounded-l-[2rem] rounded-br-[0.5rem] shadow-primary/20'
-                      : 'bg-background glass border-border/40 rounded-t-[2rem] rounded-r-[2rem] rounded-bl-[0.5rem]'
-                  )}>
-                    {msg.text}
-                  </div>
-                </motion.div>
-              ))}
+              {chatHistory.map((msg, idx) => {
+                const isUser = msg.sender === 'user';
+                return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: isUser ? 20 : -20, y: 10 }}
+                      animate={{ opacity: 1, x: 0, y: 0 }}
+                      className={cn('flex items-end gap-4', isUser ? 'flex-row-reverse' : 'flex-row')}
+                    >
+                      <Avatar className="h-10 w-10 border-2 border-white/10 shadow-lg shrink-0 mb-1">
+                        {msg.sender === 'ai' ? (
+                          <AvatarFallback className="bg-primary text-white"><Bot className="w-5 h-5" /></AvatarFallback>
+                        ) : (
+                          <>
+                            <AvatarImage src={user?.photoURL ?? undefined} />
+                            <AvatarFallback className="bg-white/10 text-white text-[10px] font-black">{userAvatarFallback.toUpperCase()}</AvatarFallback>
+                          </>
+                        )}
+                      </Avatar>
+                      <div className={cn(
+                        'text-[15px] md:text-base leading-relaxed max-w-[85%] sm:max-w-[75%] shadow-2xl transition-all duration-300 px-6 py-4 relative group',
+                        isUser
+                          ? 'bg-primary text-white rounded-[2rem] rounded-tr-none shadow-primary/20 font-medium'
+                          : 'bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] rounded-tl-none text-gray-200'
+                      )}>
+                        <div className="relative z-10">{msg.text}</div>
+                        <div className={cn(
+                            "absolute top-0 w-4 h-4",
+                            isUser ? "-right-1 bg-primary" : "-left-1 bg-white/10"
+                        )} style={{ clipPath: isUser ? 'polygon(0 0, 100% 0, 0 100%)' : 'polygon(0 0, 100% 0, 100% 100%)' }} />
+                      </div>
+                    </motion.div>
+              )})}
 
               {isRecording && liveTranscript && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-row-reverse items-end gap-3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex flex-row-reverse items-end gap-4"
                 >
-                  <Avatar className="h-8 w-8 opacity-50 shrink-0"><AvatarFallback>?</AvatarFallback></Avatar>
-                  <div className="bg-primary/50 text-white backdrop-blur-xl px-6 py-3 rounded-[2rem] rounded-br-[0.5rem] text-sm italic opacity-80">
+                  <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-1 shrink-0">
+                    <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-2 h-2 bg-primary rounded-full" />
+                  </div>
+                  <div className="bg-primary/20 backdrop-blur-2xl border border-primary/20 text-white/90 px-6 py-3 rounded-[2rem] rounded-br-none text-sm font-semibold italic">
                     {liveTranscript}...
                   </div>
                 </motion.div>
@@ -359,78 +411,112 @@ function TalkPageContent() {
 
               {isLoading && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center gap-3 text-primary font-bold text-sm bg-primary/5 w-fit px-4 py-2 rounded-full border border-primary/20"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center gap-4 pl-14"
                 >
-                  <Loader2 className="w-4 h-4 animate-spin" /> Thinking
+                  <div className="flex gap-2 p-4 rounded-[1.5rem] bg-white/5 border border-white/10 backdrop-blur-xl">
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.6 }} className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </ScrollArea>
 
-        {/* Bottom Controls */}
-        <div className="h-48 shrink-0 flex flex-col items-center justify-center gap-6 z-10">
-          <div className="flex items-center gap-4 sm:gap-8">
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="h-14 w-14 rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:border-primary/50 transition-all shadow-lg"
-            >
-              <Link href="/voice-lab"><Wand2 className="w-5 h-5" /></Link>
-            </Button>
+        {/* Immersive Bottom Controls */}
+        <div className="h-64 shrink-0 flex flex-col items-center justify-center gap-8 z-10 bg-gradient-to-t from-background via-background/90 to-transparent">
+          <div className="flex items-center gap-6 sm:gap-12">
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                asChild
+                variant="outline"
+                size="icon"
+                className="h-16 w-16 rounded-[2rem] bg-white/5 backdrop-blur-2xl border-white/5 hover:border-primary/20 hover:bg-white/10 transition-all shadow-xl group"
+                >
+                <Link href="/voice-lab"><Wand2 className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" /></Link>
+                </Button>
+            </motion.div>
 
             <div className="relative">
-              {/* Recursive Pulse Rings */}
               <AnimatePresence>
                 {isRecording && (
                   <>
                     <motion.div
-                      initial={{ scale: 1, opacity: 0.5 }}
-                      animate={{ scale: 2.2, opacity: 0 }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                      className="absolute inset-0 bg-primary/30 rounded-full"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: [1, 2.5, 1], opacity: [0, 0.2, 0] }}
+                      transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                      className="absolute inset-0 bg-primary rounded-full blur-[30px]"
                     />
                     <motion.div
-                      initial={{ scale: 1, opacity: 0.5 }}
-                      animate={{ scale: 1.8, opacity: 0 }}
-                      transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-                      className="absolute inset-0 bg-primary/20 rounded-full"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: [1, 2, 1], opacity: [0, 0.3, 0] }}
+                      transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.5 }}
+                      className="absolute inset-0 bg-primary rounded-full blur-[20px]"
                     />
+                    <motion.div 
+                        className="absolute -inset-8 border border-primary/20 rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    >
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),1)]" />
+                    </motion.div>
                   </>
                 )}
               </AnimatePresence>
 
-              <Button
-                onClick={handleMicClick}
-                disabled={isLoading}
-                className={cn(
-                  "h-24 w-24 rounded-full shadow-2xl transition-all duration-500 relative z-20 group",
-                  isRecording ? "bg-red-500 scale-110 hover:bg-red-600" : "bg-primary scale-100 hover:scale-105"
-                )}
-              >
-                {isRecording ? <Square className="w-8 h-8 fill-white" /> : <Mic className="w-10 h-10 group-hover:scale-110 transition-transform" />}
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                    onClick={handleMicClick}
+                    disabled={isLoading}
+                    className={cn(
+                    "h-28 w-28 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-700 relative z-20 overflow-hidden group border-2",
+                    isRecording 
+                        ? "bg-red-500/10 border-red-500 text-red-500" 
+                        : "bg-primary border-primary/20 text-white"
+                    )}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {isRecording 
+                        ? <Square className="w-10 h-10 fill-current animate-pulse" /> 
+                        : <Mic className="w-12 h-12 group-hover:rotate-12 transition-transform duration-500" />
+                    }
+                </Button>
+              </motion.div>
             </div>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-14 w-14 rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:border-primary/50 transition-all shadow-lg"
-              onClick={() => router.push('/chat')}
-            >
-              <Sparkles className="w-5 h-5 text-amber-500" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                variant="outline"
+                size="icon"
+                className="h-16 w-16 rounded-[2rem] bg-white/5 backdrop-blur-2xl border-white/5 hover:border-amber-500/20 hover:bg-white/10 transition-all shadow-xl group"
+                onClick={() => router.push('/chat')}
+                >
+                <Sparkles className="w-6 h-6 text-amber-500/60 group-hover:text-amber-500 transition-colors" />
+                </Button>
+            </motion.div>
           </div>
 
           <motion.div
-            animate={isRecording ? { scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] } : {}}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-            className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground transition-all duration-500"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center gap-2"
           >
-            {getStatusText()}
+            <span className={cn(
+                "text-[10px] font-black uppercase tracking-[0.4em] transition-all duration-700",
+                isRecording ? "text-red-500" : "text-primary"
+            )}>
+                {getStatusText()}
+            </span>
+            <div className="h-1 w-48 bg-white/5 rounded-full overflow-hidden">
+                <motion.div 
+                    animate={isRecording ? { x: ["-100%", "100%"] } : { x: "-100%" }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="h-full w-1/3 bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+                />
+            </div>
           </motion.div>
         </div>
       </main>

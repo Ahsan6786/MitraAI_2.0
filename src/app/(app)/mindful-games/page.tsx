@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, RotateCcw, CheckCircle, Lightbulb, Gamepad2, ArrowLeft, Cat, Dog, Bird, Fish, Rabbit, Turtle, Bug, Snail, X, Circle, Puzzle } from 'lucide-react';
+import { Play, Pause, RotateCcw, CheckCircle, Lightbulb, Gamepad2, ArrowLeft, Cat, Dog, Bird, Fish, Rabbit, Turtle, Bug, Snail, X, Circle, Puzzle, Wind, Brain, Music, Sparkles, Languages } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,9 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { GenZToggle } from '@/components/genz-toggle';
 import SectionIntroAnimation from '@/components/section-intro-animation';
+import { GlassCard } from '@/components/glass-card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SOSButton } from '@/components/sos-button';
 
 // --- Mindful Exercises Components ---
 
@@ -27,36 +30,70 @@ function BoxBreathingVisualizer({ stageIndex, countdown, isActive }: { stageInde
   const currentStage = stages[stageIndex];
 
   return (
-    <div className="flex h-96 items-center justify-center rounded-lg bg-background/50">
-        <div className="relative flex h-64 w-64 items-center justify-center">
-            {/* Dashed circle */}
-            <div className="absolute h-full w-full rounded-full border-2 border-dashed border-muted-foreground/50"></div>
+    <div className="relative flex h-[400px] items-center justify-center rounded-[3rem] bg-white/5 border border-white/10 overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
+        
+        {/* Animated Background Pulse */}
+        <AnimatePresence>
+            {isActive && (
+                <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ 
+                        scale: currentStage.name === 'Breathe In' ? 1.5 : (currentStage.name === 'Breathe Out' ? 0.8 : 1.2),
+                        opacity: [0.1, 0.2, 0.1]
+                    }}
+                    transition={{ duration: 4, ease: "easeInOut" }}
+                    className="absolute h-80 w-80 rounded-full bg-primary/20 blur-[80px]"
+                />
+            )}
+        </AnimatePresence>
+
+        <div className="relative flex h-72 w-72 items-center justify-center">
+            {/* Outer Ring */}
+            <div className="absolute h-full w-full rounded-full border border-white/10" />
             
-            {/* Animated dot */}
-            <div 
-              key={stageIndex} // Re-trigger animation on stage change
-              className={cn(
-                "h-16 w-16 rounded-full bg-primary",
-                isActive && currentStage.animation
-              )}
-            ></div>
+            {/* Stage Progress Ring */}
+            <svg className="absolute h-full w-full -rotate-90">
+                <motion.circle
+                    cx="144"
+                    cy="144"
+                    r="140"
+                    fill="transparent"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeDasharray="880"
+                    animate={{ strokeDashoffset: isActive ? 880 - (880 * ((4 - countdown) / 4)) : 880 }}
+                    className="text-primary/30"
+                />
+            </svg>
+
+            {/* Core Orb */}
+            <motion.div 
+                animate={{ 
+                    scale: isActive ? (currentStage.name === 'Breathe In' ? 1.4 : (currentStage.name === 'Breathe Out' ? 0.6 : 1.2)) : 1,
+                    boxShadow: isActive ? "0 0 50px rgba(var(--primary), 0.3)" : "none"
+                }}
+                transition={{ duration: 4, ease: "easeInOut" }}
+                className="relative z-10 h-24 w-24 rounded-full bg-white flex flex-col items-center justify-center shadow-2xl"
+            >
+                <span className="text-black font-black italic text-2xl tracking-tighter">{countdown}</span>
+                <span className="text-black/40 font-black uppercase text-[8px] tracking-[0.2em]">Sec</span>
+            </motion.div>
             
-            {/* Labels */}
-            <div className="absolute top-0 flex flex-col items-center">
-                <span className={cn("text-sm font-medium transition-colors", currentStage.name === 'Breathe In' ? 'text-foreground' : 'text-muted-foreground')}>Breathe In</span>
-                <span className={cn("text-2xl font-bold transition-colors", currentStage.name === 'Breathe In' ? 'text-foreground' : 'text-muted-foreground')}>{currentStage.name === 'Breathe In' ? countdown : '4'}s</span>
-            </div>
-            <div className="absolute right-0 flex flex-col items-center -rotate-90">
-                <span className={cn("text-sm font-medium transition-colors", currentStage.name === 'Hold' && stageIndex === 1 ? 'text-foreground' : 'text-muted-foreground')}>Hold</span>
-                <span className={cn("text-2xl font-bold transition-colors", currentStage.name === 'Hold' && stageIndex === 1 ? 'text-foreground' : 'text-muted-foreground')}>{currentStage.name === 'Hold' && stageIndex === 1 ? countdown : '4'}s</span>
-            </div>
-            <div className="absolute bottom-0 flex flex-col items-center">
-                 <span className={cn("text-sm font-medium transition-colors", currentStage.name === 'Breathe Out' ? 'text-foreground' : 'text-muted-foreground')}>Breathe Out</span>
-                <span className={cn("text-2xl font-bold transition-colors", currentStage.name === 'Breathe Out' ? 'text-foreground' : 'text-muted-foreground')}>{currentStage.name === 'Breathe Out' ? countdown : '4'}s</span>
-            </div>
-             <div className="absolute left-0 flex flex-col items-center rotate-90">
-                <span className={cn("text-sm font-medium transition-colors", currentStage.name === 'Hold' && stageIndex === 3 ? 'text-foreground' : 'text-muted-foreground')}>Hold</span>
-                <span className={cn("text-2xl font-bold transition-colors", currentStage.name === 'Hold' && stageIndex === 3 ? 'text-foreground' : 'text-muted-foreground')}>{currentStage.name === 'Hold' && stageIndex === 3 ? countdown : '4'}s</span>
+            {/* Labels Grid */}
+            <div className="absolute inset-0 p-4">
+                <div className={cn("absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-700", stageIndex === 0 ? "scale-110 opacity-100" : "scale-90 opacity-20")}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Breathe In</p>
+                </div>
+                <div className={cn("absolute right-0 top-1/2 -translate-y-1/2 rotate-90 transition-all duration-700", stageIndex === 1 ? "scale-110 opacity-100" : "scale-90 opacity-20")}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Hold</p>
+                </div>
+                <div className={cn("absolute bottom-0 left-1/2 -translate-x-1/2 transition-all duration-700", stageIndex === 2 ? "scale-110 opacity-100" : "scale-90 opacity-20")}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Breathe Out</p>
+                </div>
+                <div className={cn("absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 transition-all duration-700", stageIndex === 3 ? "scale-110 opacity-100" : "scale-90 opacity-20")}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Hold</p>
+                </div>
             </div>
         </div>
     </div>
@@ -82,8 +119,6 @@ function BoxBreathingExercise() {
               setCountdown(stages[nextIndex].duration);
               return nextIndex;
             });
-            // This return is for setCountdown, which will be updated in the next render cycle.
-            // The value here doesn't matter as much as the state updates above.
             return stages[(stageIndex + 1) % stages.length].duration; 
           }
         });
@@ -104,35 +139,65 @@ function BoxBreathingExercise() {
   };
 
   return (
-    <Card className="bg-card/80 backdrop-blur-sm">
-        <CardContent className="p-6 md:p-8">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
-                <div className="flex flex-col justify-center">
-                    <h3 className="text-3xl font-bold tracking-tight">Box Breathing</h3>
-                    <p className="mt-4 text-muted-foreground">A simple technique to calm your nervous system. Follow the visual guide to regulate your breath and reduce stress.</p>
-                    <div className="mt-8 space-y-4 text-lg">
-                        {stages.map((stage, index) => (
-                             <div key={index} className="flex items-center gap-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">{index + 1}</div>
-                                <p>{stage.name} for {stage.duration} seconds</p>
-                            </div>
-                        ))}
+    <GlassCard className="rounded-[3rem] p-0 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="p-8 md:p-12 lg:p-16 flex flex-col justify-center space-y-8">
+                <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                        <Wind className="w-3 h-3 text-primary" />
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Neural Calibration</span>
                     </div>
-                    <div className="mt-8 flex gap-4">
-                        <Button onClick={handleStartPause} size="lg">
-                            {isActive ? <Pause className="mr-2 h-5 w-5"/> : <Play className="mr-2 h-5 w-5"/>}
-                            {isActive ? 'Pause' : 'Begin Exercise'}
-                        </Button>
-                         <Button onClick={handleReset} variant="outline" size="lg">
-                            <RotateCcw className="mr-2 h-5 w-5"/>
-                            Reset
-                        </Button>
-                    </div>
+                    <h3 className="text-4xl font-black italic tracking-tightest text-white leading-tight">Box Breathing.</h3>
+                    <p className="text-muted-foreground font-medium leading-relaxed max-w-sm">
+                        Synchronize your neural rhythm with a controlled respiratory pattern. Stabilize your core frequency.
+                    </p>
                 </div>
+
+                <div className="space-y-4">
+                    {stages.map((stage, index) => (
+                         <div key={index} className="flex items-center gap-6 group">
+                            <div className={cn(
+                                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-black italic transition-all duration-500",
+                                stageIndex === index ? "bg-white text-black scale-110" : "bg-white/5 text-white/40 border border-white/10"
+                            )}>
+                                0{index + 1}
+                            </div>
+                            <div>
+                                <p className={cn("font-black italic text-lg transition-colors", stageIndex === index ? "text-white" : "text-white/20")}>{stage.name}</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/40">{stage.duration}s Interval</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-4">
+                    <Button 
+                        onClick={handleStartPause} 
+                        size="lg"
+                        className={cn(
+                            "h-14 px-8 rounded-2xl font-black italic text-xs tracking-[0.2em] transition-all active:scale-95",
+                            isActive ? "bg-rose-500 text-white hover:bg-rose-600" : "bg-white text-black hover:bg-white/90"
+                        )}
+                    >
+                        {isActive ? <Pause className="mr-3 h-4 w-4 fill-current"/> : <Play className="mr-3 h-4 w-4 fill-current"/>}
+                        {isActive ? 'PAUSE PROTOCOL' : 'INITIALIZE SYNC'}
+                    </Button>
+                     <Button 
+                        onClick={handleReset} 
+                        variant="ghost" 
+                        size="lg"
+                        className="h-14 px-8 rounded-2xl border border-white/10 text-white font-black italic text-xs tracking-widest hover:bg-white/5 transition-all"
+                    >
+                        <RotateCcw className="mr-3 h-4 w-4"/>
+                        RESET
+                    </Button>
+                </div>
+            </div>
+            <div className="bg-black/40 p-8 lg:p-12 flex items-center justify-center">
                 <BoxBreathingVisualizer stageIndex={stageIndex} countdown={countdown} isActive={isActive} />
             </div>
-        </CardContent>
-    </Card>
+        </div>
+    </GlassCard>
   );
 }
 
@@ -164,69 +229,85 @@ function GuessTheNumberGame() {
 
         const numGuess = parseInt(guess, 10);
         if (isNaN(numGuess) || numGuess < 1 || numGuess > 100) {
-            setMessage('Please enter a valid number between 1 and 100.');
+            setMessage('Input out of range. 01-100 required.');
             return;
         }
 
         setAttempts(prev => prev + 1);
 
         if (numGuess === secretNumber) {
-            setMessage(`Congratulations! You guessed the number ${secretNumber} in ${attempts + 1} attempts.`);
+            setMessage(`Neural match confirmed. Target [${secretNumber}] identified in ${attempts + 1} cycles.`);
             setIsCorrect(true);
         } else if (numGuess < secretNumber) {
-            setMessage('Too low! Try a higher number.');
+            setMessage('Target above current projection.');
         } else {
-            setMessage('Too high! Try a lower number.');
+            setMessage('Target below current projection.');
         }
         setGuess('');
     };
 
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Gamepad2 className="w-6 h-6 text-primary" />
-                    Guess the Number!
-                </CardTitle>
-                <CardDescription>
-                    I'm thinking of a number between 1 and 100. Can you guess it?
-                </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleGuess}>
-                <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                        <Input
-                            type="number"
-                            placeholder="Enter your guess"
-                            value={guess}
-                            onChange={(e) => setGuess(e.target.value)}
-                            disabled={isCorrect}
-                        />
-                        <Button type="submit" disabled={isCorrect}>
-                            Guess
-                        </Button>
-                    </div>
+        <GlassCard className="w-full max-w-lg mx-auto p-12 space-y-10 rounded-[3rem]">
+            <div className="space-y-4 text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
+                    <Brain className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Numerical Sync</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Decrypt the high-frequency integer (01-100).</p>
+            </div>
+
+            <form onSubmit={handleGuess} className="space-y-8">
+                <div className="flex gap-4">
+                    <Input
+                        type="number"
+                        placeholder="INT_ID..."
+                        className="h-16 bg-white/5 border-white/10 rounded-2xl focus:border-primary/50 focus:ring-primary/20 transition-all font-black italic text-xl px-6 text-white"
+                        value={guess}
+                        onChange={(e) => setGuess(e.target.value)}
+                        disabled={isCorrect}
+                    />
+                    <Button 
+                        type="submit" 
+                        disabled={isCorrect || !guess}
+                        className="h-16 px-10 rounded-2xl bg-white text-black font-black italic tracking-widest hover:bg-white/90 active:scale-95 transition-all"
+                    >
+                        DECRYPT
+                    </Button>
+                </div>
+                
+                <AnimatePresence mode="wait">
                     {message && (
-                        <Alert variant={isCorrect ? 'default' : 'destructive'} className={isCorrect ? 'border-green-500' : 'border-red-500'}>
-                            {isCorrect ? <CheckCircle className="h-4 w-4 text-green-600" /> : <Lightbulb className="h-4 w-4" />}
-                            <AlertTitle>{isCorrect ? 'You got it!' : 'Hint'}</AlertTitle>
-                            <AlertDescription>
-                                {message}
-                            </AlertDescription>
-                        </Alert>
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <Alert className={cn(
+                                "border-none rounded-2.5rem p-6",
+                                isCorrect ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-primary/80"
+                            )}>
+                                {isCorrect ? <CheckCircle className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
+                                <AlertTitle className="font-black uppercase tracking-widest text-[10px] mb-2">{isCorrect ? 'SYNCHRONIZED' : 'ANALYSIS'}</AlertTitle>
+                                <AlertDescription className="font-medium italic">{message}</AlertDescription>
+                            </Alert>
+                        </motion.div>
                     )}
-                </CardContent>
+                </AnimatePresence>
             </form>
-            <CardFooter className="flex-col gap-4 items-start">
-                <p className="text-sm text-muted-foreground">Attempts: {attempts}</p>
+
+            <div className="flex items-center justify-between pt-4">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Attempts</span>
+                    <span className="text-2xl font-black italic text-white tracking-widest">{attempts < 10 ? `0${attempts}` : attempts}</span>
+                </div>
                 {(isCorrect || attempts > 7) && (
-                    <Button onClick={resetGame} className="w-full">
+                    <Button onClick={resetGame} variant="ghost" className="h-12 border border-white/10 rounded-xl px-6 font-black italic text-xs tracking-widest text-white hover:bg-white/5">
                          <RotateCcw className="mr-2 h-4 w-4" />
-                        Play Again
+                        RE-INITIALIZE
                     </Button>
                 )}
-            </CardFooter>
-        </Card>
+            </div>
+        </GlassCard>
     );
 }
 
@@ -269,7 +350,7 @@ function MemoryMatchGame() {
     }, [generateCards]);
 
     const handleCardClick = (index: number) => {
-        if (flippedIndices.length === 2 || cards[index].isFlipped) return;
+        if (flippedIndices.length === 2 || cards[index].isFlipped || cards[index].isMatched) return;
 
         const newCards = [...cards];
         newCards[index].isFlipped = true;
@@ -297,52 +378,86 @@ function MemoryMatchGame() {
                     newCards[secondIndex].isFlipped = false;
                     setCards(newCards);
                     setFlippedIndices([]);
-                }, 1000);
+                }, 800);
             }
         }
     }, [flippedIndices, cards]);
 
     return (
-        <Card className="w-full max-w-lg mx-auto">
-            <CardHeader>
-                <CardTitle>Memory Match</CardTitle>
-                <CardDescription>Match the pairs of cards.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {gameOver ? (
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold text-primary">You Win!</h2>
-                        <p>You completed the game in {moves} moves.</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-4 gap-2 sm:gap-4">
-                        {cards.map((card, index) => {
-                            const Icon = card.icon;
-                            return (
-                                <button
-                                    key={index}
-                                    onClick={() => handleCardClick(index)}
-                                    className={cn(
-                                        'aspect-square rounded-md flex items-center justify-center transition-transform duration-300',
-                                        card.isFlipped ? 'bg-primary/20' : 'bg-muted hover:bg-muted/80',
-                                        card.isFlipped && 'transform rotate-y-180'
-                                    )}
-                                >
-                                    {card.isFlipped ? <Icon className="w-8 h-8 text-primary" /> : null}
-                                </button>
-                            )
-                        })}
-                    </div>
+        <GlassCard className="w-full max-w-2xl mx-auto p-12 space-y-12 rounded-[3.5rem] relative overflow-hidden">
+            <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                    <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Neural Patterns</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Match visual identifiers</p>
+                </div>
+                <div className="text-right">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Sync Cycles</p>
+                    <p className="text-2xl font-black italic text-white">{moves < 10 ? `0${moves}` : moves}</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 sm:gap-6">
+                <AnimatePresence>
+                    {cards.map((card, index) => {
+                        const Icon = card.icon;
+                        return (
+                            <motion.button
+                                key={index}
+                                whileHover={{ scale: card.isFlipped ? 1 : 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleCardClick(index)}
+                                className={cn(
+                                    'aspect-square rounded-[2rem] flex items-center justify-center transition-all duration-500 border relative overflow-hidden',
+                                    card.isFlipped || card.isMatched 
+                                        ? 'bg-white border-white' 
+                                        : 'bg-white/5 border-white/10 hover:border-white/20'
+                                )}
+                            >
+                                {(card.isFlipped || card.isMatched) ? (
+                                    <motion.div initial={{ rotateY: 180 }} animate={{ rotateY: 0 }}>
+                                        <Icon className="w-10 h-10 text-black" />
+                                    </motion.div>
+                                ) : (
+                                    <Sparkles className="w-5 h-5 text-white/5 group-hover:text-white/20 transition-colors" />
+                                )}
+                                {card.isMatched && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="absolute inset-0 bg-primary/20 backdrop-blur-sm flex items-center justify-center"
+                                    >
+                                        <CheckCircle className="w-12 h-12 text-black" />
+                                    </motion.div>
+                                )}
+                            </motion.button>
+                        )
+                    })}
+                </AnimatePresence>
+            </div>
+
+            <AnimatePresence>
+                {gameOver && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center space-y-6 pt-4"
+                    >
+                        <h2 className="text-4xl font-black italic tracking-tightest text-primary uppercase">Synchronization Complete</h2>
+                        <Button onClick={generateCards} className="h-14 px-10 bg-white text-black font-black italic tracking-widest rounded-2xl hover:bg-white/90">
+                            <RotateCcw className="mr-3 h-4 w-4" />
+                            RE-INITIALIZE
+                        </Button>
+                    </motion.div>
                 )}
-            </CardContent>
-            <CardFooter className="flex flex-col items-center gap-4">
-                 <p className="text-sm text-muted-foreground">Moves: {moves}</p>
-                 <Button onClick={generateCards} className="w-full">
-                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Reset Game
+            </AnimatePresence>
+
+            {!gameOver && (
+                 <Button onClick={generateCards} variant="ghost" className="w-full h-12 border border-white/10 rounded-2xl font-black italic text-xs tracking-widest text-white hover:bg-white/5">
+                     <RotateCcw className="mr-3 h-4 w-4" />
+                    FORCED RE-SYNC
                 </Button>
-            </CardFooter>
-        </Card>
+            )}
+        </GlassCard>
     );
 }
 
@@ -385,51 +500,82 @@ function WordUnscrambleGame() {
     const handleGuess = (e: React.FormEvent) => {
         e.preventDefault();
         if (guess.toLowerCase() === currentWord) {
-            setMessage('Correct! Well done.');
+            setMessage('Linguistic pattern recognized. Decryption successful.');
             setIsCorrect(true);
         } else {
-            setMessage('Not quite, try again!');
+            setMessage('Input mismatch. Re-calculating...');
         }
     };
     
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle>Word Unscramble</CardTitle>
-                <CardDescription>Unscramble the letters to form a word.</CardDescription>
-            </CardHeader>
-            <form onSubmit={handleGuess}>
-                <CardContent className="space-y-4">
-                     <div className="text-center text-4xl font-bold tracking-widest uppercase bg-muted p-4 rounded-md">
-                        {scrambledWord}
-                    </div>
-                    <div className="flex gap-2">
-                        <Input
-                            placeholder="Your guess"
-                            value={guess}
-                            onChange={(e) => setGuess(e.target.value)}
-                            disabled={isCorrect}
-                        />
-                         <Button type="submit" disabled={isCorrect}>
-                            Check
-                        </Button>
-                    </div>
+        <GlassCard className="w-full max-w-lg mx-auto p-12 space-y-10 rounded-[3rem]">
+            <div className="space-y-4 text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
+                    <Languages className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Lexical Decrypt</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Restore the original semantic sequence.</p>
+            </div>
+
+            <div className="py-8 px-4 bg-white/5 rounded-[2rem] border border-white/10 text-center">
+                <div className="flex justify-center gap-2 flex-wrap">
+                    {scrambledWord.toUpperCase().split('').map((char, i) => (
+                        <motion.div 
+                            key={i}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="w-12 h-14 bg-white flex items-center justify-center rounded-xl font-black italic text-2xl text-black shadow-xl"
+                        >
+                            {char}
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+
+            <form onSubmit={handleGuess} className="space-y-6">
+                <div className="flex gap-4">
+                    <Input
+                        placeholder="UNSCRAMBLE..."
+                        className="h-16 bg-white/5 border-white/10 rounded-2xl focus:border-primary/50 focus:ring-primary/20 transition-all font-black italic text-xl px-6 text-white uppercase tracking-widest"
+                        value={guess}
+                        onChange={(e) => setGuess(e.target.value)}
+                        disabled={isCorrect}
+                    />
+                    <Button 
+                        type="submit" 
+                        disabled={isCorrect || !guess}
+                        className="h-16 px-10 rounded-2xl bg-white text-black font-black italic tracking-widest hover:bg-white/90 active:scale-95 transition-all"
+                    >
+                        SYNC
+                    </Button>
+                </div>
+                
+                <AnimatePresence mode="wait">
                     {message && (
-                        <Alert variant={isCorrect ? 'default' : 'destructive'} className={isCorrect ? 'border-green-500' : 'border-red-500'}>
-                             {isCorrect ? <CheckCircle className="h-4 w-4 text-green-600" /> : <Lightbulb className="h-4 w-4" />}
-                             <AlertTitle>{isCorrect ? 'Success!' : 'Hint'}</AlertTitle>
-                             <AlertDescription>{message}</AlertDescription>
-                        </Alert>
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                        >
+                            <Alert className={cn(
+                                "border-none rounded-2.5rem p-6",
+                                isCorrect ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-primary/80"
+                            )}>
+                                {isCorrect ? <CheckCircle className="h-5 w-5" /> : <Lightbulb className="h-5 w-5" />}
+                                <AlertTitle className="font-black uppercase tracking-widest text-[10px] mb-2">{isCorrect ? 'VALIDATED' : 'FEEDBACK'}</AlertTitle>
+                                <AlertDescription className="font-medium italic">{message}</AlertDescription>
+                            </Alert>
+                        </motion.div>
                     )}
-                </CardContent>
+                </AnimatePresence>
             </form>
-            <CardFooter>
-                 <Button onClick={newWord} className="w-full">
-                     <RotateCcw className="mr-2 h-4 w-4" />
-                    New Word
-                </Button>
-            </CardFooter>
-        </Card>
+
+            <Button onClick={newWord} variant="ghost" className="w-full h-12 border border-white/10 rounded-xl px-6 font-black italic text-xs tracking-widest text-white hover:bg-white/5">
+                 <RotateCcw className="mr-2 h-4 w-4" />
+                {isCorrect ? 'NEXT SEQUENCE' : 'RE-SCRAMBLE'}
+            </Button>
+        </GlassCard>
     );
 }
 
@@ -491,49 +637,90 @@ function TicTacToeGame() {
     };
 
     const renderStatus = () => {
-        if (winner) return `Winner: ${winner}!`;
-        if (isDraw) return "It's a draw!";
-        return `Your Turn (X)`;
+        if (winner) return `Protocol Result: ${winner} Dominance`;
+        if (isDraw) return "Neural Stalemate";
+        return isXNext ? "User Input Required" : "AI Processing...";
     };
     
     return (
-         <Card className="w-full max-w-sm mx-auto">
-            <CardHeader>
-                <CardTitle>Tic-Tac-Toe</CardTitle>
-                <CardDescription>Can you beat the AI?</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-3 gap-2">
-                    {board.map((value, i) => (
-                        <Button
-                            key={i}
-                            variant="outline"
-                            className="aspect-square h-auto w-full text-4xl font-bold"
-                            onClick={() => handleClick(i)}
-                            disabled={!isXNext}
-                        >
-                            {value === 'X' && <X className="w-10 h-10 text-destructive"/>}
-                            {value === 'O' && <Circle className="w-10 h-10 text-primary"/>}
-                        </Button>
-                    ))}
+         <GlassCard className="w-full max-w-lg mx-auto p-12 space-y-12 rounded-[3.5rem] relative overflow-hidden">
+            <div className="space-y-4 text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
+                    <Gamepad2 className="w-10 h-10 text-primary" />
                 </div>
-                <div className="mt-4 text-center font-semibold">{renderStatus()}</div>
-            </CardContent>
-            <CardFooter>
-                 <Button onClick={resetGame} className="w-full">
-                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Reset Game
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Grid Contention</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Outmaneuver the synthetic logic core.</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+                {board.map((value, i) => (
+                    <motion.button
+                        key={i}
+                        whileHover={{ scale: value ? 1 : 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={cn(
+                            "aspect-square h-auto w-full rounded-2xl border transition-all duration-300 flex items-center justify-center relative bg-white/5 border-white/10",
+                            value === 'X' && "bg-white border-white",
+                            value === 'O' && "bg-rose-500/10 border-rose-500/50"
+                        )}
+                        onClick={() => handleClick(i)}
+                        disabled={!isXNext || !!value || !!winner}
+                    >
+                        {value === 'X' && <X className="w-12 h-12 text-black"/>}
+                        {value === 'O' && <Circle className="w-12 h-12 text-rose-500"/>}
+                        {!value && <div className="w-1.5 h-1.5 rounded-full bg-white/20" />}
+                    </motion.button>
+                ))}
+            </div>
+
+            <div className="space-y-6">
+                <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mb-1">Status</p>
+                    <p className="font-black italic text-white text-lg tracking-widest">{renderStatus()}</p>
+                </div>
+
+                <Button onClick={resetGame} variant="ghost" className="w-full h-14 border border-white/10 rounded-2xl font-black italic text-xs tracking-widest text-white hover:bg-white/5">
+                    <RotateCcw className="mr-3 h-4 w-4" />
+                    RESET GRID
                 </Button>
-            </CardFooter>
-        </Card>
+            </div>
+        </GlassCard>
     );
 }
 
 const games = [
-    { id: 'guess-the-number', name: 'Guess the Number', component: <GuessTheNumberGame />, description: "I'm thinking of a number between 1 and 100. Can you guess it?" },
-    { id: 'memory-match', name: 'Memory Match', component: <MemoryMatchGame />, description: "Test your memory with this classic game. Match pairs of cards to clear the board and improve focus." },
-    { id: 'word-unscramble', name: 'Word Unscramble', component: <WordUnscrambleGame />, description: "Unscramble letters to form a word. A fun way to boost your vocabulary and cognitive skills." },
-    { id: 'tic-tac-toe', name: 'Tic-Tac-Toe', component: <TicTacToeGame />, description: "A simple yet engaging game to challenge your strategic thinking. Play against the AI." },
+    { 
+        id: 'guess-the-number', 
+        name: 'Numerical Sync', 
+        component: <GuessTheNumberGame />, 
+        icon: Brain,
+        category: 'Cognitive',
+        description: "Decrypt the high-frequency integer. Enhance your focal precision through numerical deduction." 
+    },
+    { 
+        id: 'memory-match', 
+        name: 'Neural Patterns', 
+        component: <MemoryMatchGame />, 
+        icon: Sparkles,
+        category: 'Memory',
+        description: "Visualize and match core identifiers. Strengthen your visual working memory cycles." 
+    },
+    { 
+        id: 'word-unscramble', 
+        name: 'Lexical Decrypt', 
+        component: <WordUnscrambleGame />, 
+        icon: Languages,
+        category: 'Linguistic',
+        description: "Restore original semantic sequences. Refine your linguistic processing and pattern recognition." 
+    },
+    { 
+        id: 'tic-tac-toe', 
+        name: 'Grid Contention', 
+        component: <TicTacToeGame />, 
+        icon: Gamepad2,
+        category: 'Strategy',
+        description: "Challenge the synthetic logic core. Navigate a finite state machine towards victory." 
+    },
 ];
 
 
@@ -542,120 +729,204 @@ function MindfulGamesPageContent() {
     const SelectedGameComponent = games.find(g => g.id === activeGame)?.component;
 
   return (
-    <>
-    <style jsx global>{`
-        @keyframes breathe-in {
-            0% { transform: scale(0.8); }
-            100% { transform: scale(1.2); }
-        }
-        @keyframes hold {
-            0%, 100% { transform: scale(1.2); }
-        }
-        @keyframes breathe-out {
-            0% { transform: scale(1.2); }
-            100% { transform: scale(0.8); }
-        }
-        .animate-breathe-in {
-            animation: breathe-in 4s ease-in-out forwards;
-        }
-        .animate-hold {
-             animation: hold 4s ease-in-out forwards;
-        }
-        .animate-breathe-out {
-            animation: breathe-out 4s ease-in-out forwards;
-        }
-    `}</style>
-    <div className="h-full flex flex-col bg-muted/30">
-      <header className="border-b p-3 md:p-4 flex items-center justify-between gap-2 bg-background">
-        <div className="flex items-center gap-2">
-            <SidebarTrigger className="md:hidden" />
-            <div>
-              <h1 className="text-lg md:text-xl font-bold">Mindful Games</h1>
-              <p className="text-sm text-muted-foreground">
-                Fun ways to find calm and focus.
-              </p>
+    <div className="min-h-screen flex flex-col bg-black text-white selection:bg-primary selection:text-black">
+      {/* Background Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <motion.div 
+            animate={{ 
+                x: [0, 100, 0], 
+                y: [0, 50, 0],
+                scale: [1, 1.2, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-primary/20 rounded-full blur-[120px]" 
+          />
+          <motion.div 
+            animate={{ 
+                x: [0, -80, 0], 
+                y: [0, 120, 0],
+                scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[100px]" 
+          />
+      </div>
+
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-black/40 backdrop-blur-xl px-6 h-20 flex items-center justify-between">
+        <div className="flex items-center gap-6">
+            <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
+            <div className="h-8 w-px bg-white/10 hidden md:block" />
+            <div className="flex flex-col">
+              <h1 className="text-xl font-black italic tracking-tighter leading-none">NEURAL_STATION.</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Cognitive Calibration Hub</p>
             </div>
         </div>
-        <div className="flex items-center gap-2">
-            <GenZToggle />
+        <div className="flex items-center gap-4">
+             <div className="hidden sm:block">
+                <GenZToggle />
+            </div>
             <ThemeToggle />
+            <SOSButton />
         </div>
       </header>
-      <main className="flex-1 overflow-auto p-4 sm:p-6 md:p-12">
-        <div className="mx-auto max-w-5xl">
-             {activeGame && SelectedGameComponent ? (
-                <div className="animate-in fade-in-50">
-                    <Button variant="ghost" onClick={() => setActiveGame(null)} className="mb-6">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Games
-                    </Button>
-                    {SelectedGameComponent}
-                </div>
-                ) : (
-                <>
-                    <div className="mb-10 text-center">
-                        <h1 className="text-4xl font-bold tracking-tight">Stress Reduction Tools</h1>
-                        <p className="mt-2 text-lg text-muted-foreground">Find calm and focus with our guided exercises and games.</p>
-                    </div>
-                    <Tabs defaultValue="box-breathing" className="w-full">
-                        <TabsList className="flex justify-center -mb-px bg-transparent p-0 gap-8">
-                            <TabsTrigger value="box-breathing" className="whitespace-nowrap border-b-2 data-[state=active]:border-primary data-[state=inactive]:border-transparent px-4 py-4 text-base font-semibold data-[state=inactive]:text-muted-foreground data-[state=active]:text-primary data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground rounded-none shadow-none bg-transparent">
-                                Box Breathing 
-                            </TabsTrigger>
-                            <TabsTrigger value="meditation" className="whitespace-nowrap border-b-2 data-[state=active]:border-primary data-[state=inactive]:border-transparent px-4 py-4 text-base font-medium data-[state=inactive]:text-muted-foreground data-[state=active]:text-primary data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground rounded-none shadow-none bg-transparent">
-                                Guided Meditation
-                            </TabsTrigger>
-                            <TabsTrigger value="listening" className="whitespace-nowrap border-b-2 data-[state=active]:border-primary data-[state=inactive]:border-transparent px-4 py-4 text-base font-medium data-[state=inactive]:text-muted-foreground data-[state=active]:text-primary data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground rounded-none shadow-none bg-transparent">
-                            Mindful Listening
-                            </TabsTrigger>
-                        </TabsList>
-                        <div className="border-b border-border/50"></div>
-                        <div className="mt-10">
-                            <TabsContent value="box-breathing">
-                                <BoxBreathingExercise />
-                            </TabsContent>
-                            <TabsContent value="meditation">
-                                <Card className="text-center p-10">
-                                    <h3 className="text-2xl font-bold">Guided Meditation</h3>
-                                    <p className="text-muted-foreground mt-2">Coming soon! A guided meditation to help you relax and focus.</p>
-                                </Card>
-                            </TabsContent>
-                            <TabsContent value="listening">
-                                <Card className="text-center p-10">
-                                    <h3 className="text-2xl font-bold">Mindful Listening</h3>
-                                    <p className="text-muted-foreground mt-2">An exercise to help you focus on the present moment through sound.</p>
-                                </Card>
-                            </TabsContent>
-                        </div>
-                    </Tabs>
 
-                    <div className="mt-16 space-y-8">
-                        <div className="text-center">
-                            <h2 className="text-3xl font-bold tracking-tight">Mind Games</h2>
-                            <p className="mt-2 text-lg text-muted-foreground">Engage your mind with these relaxing and fun games.</p>
+      <main className="flex-1 relative z-10 overflow-x-hidden p-6 md:p-12 lg:p-20">
+        <div className="mx-auto max-w-7xl w-full">
+             <AnimatePresence mode="wait">
+                {activeGame && SelectedGameComponent ? (
+                    <motion.div 
+                        key="active-game"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        className="space-y-12"
+                    >
+                        <div className="flex items-center justify-between">
+                            <Button 
+                                variant="ghost" 
+                                onClick={() => setActiveGame(null)} 
+                                className="h-12 border border-white/10 rounded-2xl px-6 font-black italic text-xs tracking-widest text-white hover:bg-white/5 active:scale-95 transition-all"
+                            >
+                                <ArrowLeft className="mr-3 h-4 w-4" />
+                                RETURN_TO_HUB
+                            </Button>
+                            
+                            <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Active_Terminal: {activeGame?.toUpperCase()}</span>
+                            </div>
                         </div>
-                        {games.map(game => (
-                            <Card key={game.id} className="bg-card/80 backdrop-blur-sm">
-                                <CardContent className="p-8">
-                                    <div className="flex flex-col justify-center">
-                                        <h3 className="text-2xl font-bold tracking-tight">{game.name}</h3>
-                                        <p className="mt-2 text-muted-foreground">{game.description}</p>
-                                        <div className="mt-6">
-                                            <Button onClick={() => setActiveGame(game.id)}>
-                                                Play Now
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </>
-            )}
+                        
+                        <div className="perspective-1000">
+                            {SelectedGameComponent}
+                        </div>
+                    </motion.div>
+                    ) : (
+                    <motion.div 
+                        key="hub"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="space-y-24"
+                    >
+                        {/* Hero Section */}
+                        <div className="max-w-3xl space-y-6">
+                            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                </span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Calibration Online</span>
+                            </div>
+                            <h1 className="text-6xl md:text-8xl font-black italic tracking-tightest leading-none text-white">
+                                FOCUS.<br/>
+                                <span className="text-primary">FLOW.</span><br/>
+                                FEEL.
+                            </h1>
+                            <p className="text-xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
+                                Access high-frequency tools designed to reset your neural pathways. Choose a calibration protocol below.
+                            </p>
+                        </div>
+
+                        {/* Exercises Tabs */}
+                        <div className="space-y-10">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-4">
+                                <div>
+                                    <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Rhythm Protocols</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Guided Sensory Tuning</p>
+                                </div>
+                            </div>
+
+                            <Tabs defaultValue="box-breathing" className="w-full">
+                                <TabsList className="flex items-center gap-2 bg-white/5 p-1 rounded-[1.5rem] border border-white/10 mb-12 w-fit">
+                                    <TabsTrigger value="box-breathing" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                        BREATHING
+                                    </TabsTrigger>
+                                    <TabsTrigger value="meditation" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                        MEDITATION
+                                    </TabsTrigger>
+                                    <TabsTrigger value="listening" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                        LISTENING
+                                    </TabsTrigger>
+                                </TabsList>
+
+                                <div className="mt-8">
+                                    <TabsContent value="box-breathing">
+                                        <BoxBreathingExercise />
+                                    </TabsContent>
+                                    <TabsContent value="meditation">
+                                        <GlassCard className="text-center p-20 rounded-[3rem] border-dashed border-white/20">
+                                            <Music className="w-16 h-16 text-white/10 mx-auto mb-6" />
+                                            <h3 className="text-2xl font-black italic uppercase mb-2">Guided Meditation</h3>
+                                            <p className="text-muted-foreground">Neural frequency tuning coming soon.</p>
+                                        </GlassCard>
+                                    </TabsContent>
+                                    <TabsContent value="listening">
+                                         <GlassCard className="text-center p-20 rounded-[3rem] border-dashed border-white/20">
+                                            <Wind className="w-16 h-16 text-white/10 mx-auto mb-6" />
+                                            <h3 className="text-2xl font-black italic uppercase mb-2">Mindful Listening</h3>
+                                            <p className="text-muted-foreground">Ambient soundscapes in development.</p>
+                                        </GlassCard>
+                                    </TabsContent>
+                                </div>
+                            </Tabs>
+                        </div>
+
+                        {/* Games Grid */}
+                        <div className="space-y-12">
+                            <div>
+                                <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Cognitive Terminals</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Operational Logic Testing</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {games.map((game, i) => {
+                                    const Icon = game.icon;
+                                    return (
+                                        <motion.div
+                                            key={game.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: i * 0.1 }}
+                                        >
+                                            <GlassCard className="group relative h-full flex flex-col p-8 rounded-[2.5rem] hover:bg-white/10 transition-all duration-500 cursor-pointer overflow-hidden border-white/10 hover:border-primary/30" onClick={() => setActiveGame(game.id)}>
+                                                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="bg-primary/20 text-primary p-2 rounded-xl">
+                                                        <ArrowLeft className="w-4 h-4 rotate-180" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-8 border border-white/10 group-hover:bg-primary/10 group-hover:border-primary/20 transition-colors">
+                                                    <Icon className="w-6 h-6 text-white group-hover:text-primary transition-colors" />
+                                                </div>
+
+                                                <div className="mt-auto space-y-4">
+                                                    <div className="space-y-1">
+                                                        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">{game.category}</p>
+                                                        <h3 className="text-xl font-black italic uppercase tracking-tighter">{game.name}</h3>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                                                        {game.description}
+                                                    </p>
+                                                    <div className="pt-2">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">INITIALIZE_SEQUENCE //</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Decorative background number */}
+                                                <span className="absolute -bottom-6 -right-6 text-9xl font-black italic text-white/[0.02] pointer-events-none group-hover:text-primary/[0.03] transition-colors">{i + 1}</span>
+                                            </GlassCard>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+             </AnimatePresence>
         </div>
       </main>
     </div>
-    </>
   );
 }
 

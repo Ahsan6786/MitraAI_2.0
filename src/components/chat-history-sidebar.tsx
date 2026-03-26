@@ -132,23 +132,25 @@ function SidebarContent({ currentConversationId }: { currentConversationId?: str
     };
     
     return (
-        <div className="h-full px-4 py-6 flex flex-col gap-6">
+        <div className="h-full px-5 py-8 flex flex-col gap-8">
              <Button 
                 onClick={handleNewChat} 
-                className="w-full rounded-full h-12 bg-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all gap-2 font-bold italic tracking-tight"
+                className="w-full rounded-[1.5rem] h-14 bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all gap-3 font-black italic tracking-tight text-base"
             >
                 <Plus className="h-5 w-5" />
-                New Chat
+                Initiate New
             </Button>
 
-            <div className="space-y-4 flex-1 flex flex-col min-h-0">
-                <div className="flex items-center gap-2 px-2 text-[10px] uppercase font-black tracking-widest text-muted-foreground/60">
-                    <History className="w-3 h-3" />
-                    Recent History
+            <div className="space-y-6 flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between px-2">
+                    <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-primary/60">
+                        <History className="w-4 h-4" />
+                        Neural Archives
+                    </div>
                 </div>
                 
                 <ScrollArea className="flex-1 -mx-2 px-2">
-                    <div className="space-y-2 py-1">
+                    <div className="space-y-3 py-2">
                         <AnimatePresence mode="popLayout">
                             {conversations.map((convo, idx) => (
                                 <motion.div 
@@ -159,50 +161,59 @@ function SidebarContent({ currentConversationId }: { currentConversationId?: str
                                     className="group relative"
                                 >
                                     {editingId === convo.id ? (
-                                        <div className="flex items-center gap-2 glass p-1.5 rounded-full border-primary/20">
+                                        <div className="flex items-center gap-2 bg-white/5 backdrop-blur-3xl p-2 rounded-2xl border border-primary/30 shadow-lg">
                                             <Input 
                                                 value={renameValue} 
                                                 onChange={e => setRenameValue(e.target.value)}
-                                                className="h-8 rounded-full border-none bg-transparent focus-visible:ring-0 text-sm"
+                                                className="h-9 rounded-xl border-none bg-transparent focus-visible:ring-0 text-white font-medium text-sm"
                                                 autoFocus
                                             />
-                                            <Button size="icon" className="h-8 w-8 rounded-full shrink-0" onClick={handleConfirmRename}><Check className="w-4 h-4"/></Button>
-                                            <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full shrink-0" onClick={handleCancelRename}><X className="w-4 h-4"/></Button>
+                                            <div className="flex items-center gap-1">
+                                                <Button size="icon" className="h-8 w-8 rounded-xl bg-primary hover:bg-primary/90" onClick={handleConfirmRename}><Check className="w-4 h-4 text-white"/></Button>
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-xl text-muted-foreground hover:bg-white/5" onClick={handleCancelRename}><X className="w-4 h-4"/></Button>
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
                                             <Link
                                                 href={`/chat/${convo.id}`}
                                                 className={cn(
-                                                    "w-full h-11 justify-start px-4 flex items-center gap-3 text-sm font-medium rounded-full transition-all duration-300",
+                                                    "w-full h-14 justify-start px-5 flex items-center gap-4 text-sm font-semibold rounded-[1.2rem] transition-all duration-300 relative overflow-hidden group/link",
                                                     currentConversationId === convo.id 
-                                                        ? "bg-primary/10 text-primary border border-primary/20 shadow-sm" 
-                                                        : "hover:bg-accent border border-transparent"
+                                                        ? "bg-white/10 text-white border border-white/20 shadow-xl" 
+                                                        : "hover:bg-white/5 border border-transparent text-muted-foreground hover:text-white"
                                                 )}
                                                 onClick={handleLinkClick}
                                             >
-                                                <div className={cn(
-                                                    "h-2 w-2 rounded-full",
-                                                    currentConversationId === convo.id ? "bg-primary animate-pulse" : "bg-muted-foreground/30"
+                                                {currentConversationId === convo.id && (
+                                                    <motion.div 
+                                                        layoutId="active-pill"
+                                                        className="absolute left-0 w-1.5 h-full bg-primary"
+                                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                    />
+                                                )}
+                                                <MessageSquare className={cn(
+                                                    "w-4 h-4 transition-colors",
+                                                    currentConversationId === convo.id ? "text-primary" : "text-muted-foreground/40 group-hover/link:text-primary/60"
                                                 )} />
                                                 <span className="truncate flex-1 tracking-tight">{convo.title}</span>
                                             </Link>
-                                            <div className="absolute top-1/2 right-2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-accent/80 backdrop-blur-md p-1 rounded-full">
-                                                <Button size="icon" variant="ghost" className="h-7 w-7 rounded-full hover:text-primary transition-colors" onClick={() => handleStartRename(convo)}><Edit className="w-3.5 h-3.5"/></Button>
+                                            <div className="absolute top-1/2 right-3 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                                                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-xl hover:bg-white/10 hover:text-primary transition-colors" onClick={() => handleStartRename(convo)}><Edit className="w-4 h-4"/></Button>
                                                  <AlertDialog>
                                                     <AlertDialogTrigger asChild>
-                                                        <Button size="icon" variant="ghost" className="h-7 w-7 rounded-full hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5"/></Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 rounded-xl hover:bg-destructive/20 hover:text-destructive transition-colors"><Trash2 className="w-4 h-4"/></Button>
                                                     </AlertDialogTrigger>
-                                                    <AlertDialogContent className="rounded-[2rem] glass backdrop-blur-3xl border-border/40">
+                                                    <AlertDialogContent className="rounded-[2.5rem] bg-[#0d131a] border border-white/10 backdrop-blur-3xl p-10">
                                                         <AlertDialogHeader>
-                                                            <AlertDialogTitle className="text-2xl font-black italic tracking-tighter">Are you sure?</AlertDialogTitle>
-                                                            <AlertDialogDescription className="text-muted-foreground leading-relaxed">
-                                                                This will permanently erase all memories from this specific conversation. This action cannot be undone.
+                                                            <AlertDialogTitle className="text-3xl font-black italic tracking-tighter text-white">Purge Neural Memory?</AlertDialogTitle>
+                                                            <AlertDialogDescription className="text-muted-foreground text-lg leading-relaxed pt-2">
+                                                                This will permanently erase all traces of this conversation from our secure cloud. This action is irreversible.
                                                             </AlertDialogDescription>
                                                         </AlertDialogHeader>
-                                                        <AlertDialogFooter className="gap-2">
-                                                            <AlertDialogCancel className="rounded-full border-border/50">Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(convo.id)} className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete Memory</AlertDialogAction>
+                                                        <AlertDialogFooter className="pt-8 gap-4">
+                                                            <AlertDialogCancel className="rounded-full h-14 px-8 border-white/10 bg-transparent text-white hover:bg-white/5">Abort</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(convo.id)} className="rounded-full h-14 px-8 bg-destructive text-white hover:bg-destructive/90 shadow-xl shadow-destructive/20">Purge Memory</AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
@@ -215,14 +226,17 @@ function SidebarContent({ currentConversationId }: { currentConversationId?: str
                     </div>
                 </ScrollArea>
                 
-                <div className="pt-4 border-t border-border/40 mt-auto">
-                    <div className="bg-primary/5 rounded-[1.5rem] p-4 border border-primary/10 group cursor-pointer hover:bg-primary/10 transition-colors">
-                        <div className="flex items-center gap-3 mb-1">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <span className="text-xs font-black uppercase tracking-widest text-primary">Pro Tips</span>
+                <div className="pt-6 border-t border-white/10 mt-auto">
+                    <div className="bg-white/5 rounded-[2rem] p-6 border border-white/5 group cursor-pointer hover:bg-white/10 transition-all duration-500 relative overflow-hidden">
+                        <motion.div 
+                            className="absolute -right-10 -bottom-10 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"
+                        />
+                        <div className="flex items-center gap-3 mb-2 relative z-10">
+                            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Pro Tip</span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground leading-snug">
-                            Try <strong>Gen Z Mode</strong> in your settings for a more expressive vibe. ✨
+                        <p className="text-xs text-muted-foreground/80 leading-relaxed relative z-10">
+                            Harness the power of <strong>Gen Z Mode</strong> in settings for a more authentic, soul-aligned vibe. ✨
                         </p>
                     </div>
                 </div>
@@ -238,9 +252,9 @@ export function ChatHistorySidebar({ currentConversationId }: { currentConversat
     if (isMobile) {
         return (
             <Sheet open={chatHistorySidebar.isOpen} onOpenChange={chatHistorySidebar.setIsOpen}>
-                <SheetContent side="left" className="p-0 w-80 rounded-r-[2rem] glass border-none">
-                    <SheetHeader className="p-6 border-b border-border/40">
-                        <SheetTitle className="text-2xl font-black italic tracking-tighter">My History</SheetTitle>
+                <SheetContent side="left" className="p-0 w-80 bg-background/80 backdrop-blur-3xl border-r-white/10">
+                    <SheetHeader className="p-8 border-b border-white/10">
+                        <SheetTitle className="text-3xl font-black italic tracking-tighter text-white">Archives</SheetTitle>
                     </SheetHeader>
                     <SidebarContent currentConversationId={currentConversationId} />
                 </SheetContent>
@@ -249,7 +263,7 @@ export function ChatHistorySidebar({ currentConversationId }: { currentConversat
     }
 
     return (
-        <aside className="h-full w-72 bg-muted/20 border-r border-border/40 flex-col hidden md:flex sticky top-0">
+        <aside className="h-full w-80 bg-background/40 backdrop-blur-2xl border-r border-white/10 flex-col hidden lg:flex sticky top-0 z-40">
             <SidebarContent currentConversationId={currentConversationId} />
         </aside>
     );

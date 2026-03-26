@@ -8,15 +8,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck } from 'lucide-react';
 import { Logo } from '@/components/icons';
 
-function CounsellorSignInForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const ADMIN_EMAIL = 'ahsan.khan@mitwpu.edu.in';
+
+function AdminSignInForm() {
+  const [email, setEmail] = useState('ahsan.khan@mitwpu.edu.in');
+  const [password, setPassword] = useState('123456');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -28,31 +29,13 @@ function CounsellorSignInForm() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Check if the user is a counsellor and is approved
-      const counsellorDoc = await getDoc(doc(db, 'counsellors', user.uid));
-      if (counsellorDoc.exists()) {
-        const counsellorData = counsellorDoc.data();
-        if (counsellorData.status === 'approved') {
-          router.push('/counsellor');
-        } else if (counsellorData.status === 'pending') {
-           toast({
-            title: "Account Pending",
-            description: "Your account is awaiting admin approval.",
-            variant: "default",
-          });
-          await auth.signOut(); // Sign out the user
-        } else {
-           toast({
-            title: "Access Denied",
-            description: "Your account has not been approved.",
-            variant: "destructive",
-          });
-          await auth.signOut();
-        }
+      // Check if the user is the admin
+      if (user.email === ADMIN_EMAIL) {
+        router.push('/admin');
       } else {
         toast({
-          title: "Not a Counsellor Account",
-          description: "This email is not registered as a counsellor.",
+          title: "Access Denied",
+          description: "This account does not have administrative privileges.",
           variant: "destructive",
         });
         await auth.signOut();
@@ -75,18 +58,21 @@ function CounsellorSignInForm() {
              <div className="flex justify-center mb-4">
                <Logo className="w-10 h-10 text-primary" />
              </div>
-            <CardTitle className="text-2xl">Counsellor Login</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl flex items-center justify-center gap-2">
+                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                Admin Login
+            </CardTitle>
             <CardDescription>
-              Enter your credentials to access the counsellor panel.
+              Enter your administrative credentials to access the panel.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Admin Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -108,38 +94,26 @@ function CounsellorSignInForm() {
           <CardFooter className="flex flex-col gap-4">
             <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login
+              Login as Admin
             </Button>
-            <div className="text-center text-sm">
-              Don&apos;t have a counsellor account?{' '}
-              <Link href="/counsellor-signup" className="underline">
-                Join Now
-              </Link>
-            </div>
              <div className="text-center text-sm">
-              Not a counsellor?{' '}
+              Not an admin?{' '}
               <Link href="/signin" className="underline">
                 Login as a user
               </Link>
             </div>
-             <div className="text-center text-sm text-muted-foreground mt-2">
-               Are you an admin?{' '}
-               <Link href="/admin-signin" className="underline text-primary font-semibold">
-                 Admin Login
-               </Link>
-             </div>
           </CardFooter>
         </form>
     </Card>
   );
 }
 
-export default function CounsellorSignInPage() {
+export default function AdminSignInPage() {
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
 
-    return isClient ? <CounsellorSignInForm /> : null;
+    return isClient ? <AdminSignInForm /> : null;
 }

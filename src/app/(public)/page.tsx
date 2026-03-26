@@ -41,7 +41,7 @@ function ModernHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tightest mb-6 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent italic leading-[0.9]"
+          className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tightest mb-6 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent italic leading-[0.95]"
         >
           Meet Your <br />
           <span className="text-primary italic">Soul Ally</span>
@@ -60,17 +60,17 @@ function ModernHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto"
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0"
         >
-          <Button size="lg" className="h-16 px-12 text-xl rounded-full shadow-2xl shadow-primary/30 group" asChild>
+          <Button size="lg" className="h-14 sm:h-16 px-8 sm:px-12 text-lg sm:text-xl rounded-full shadow-2xl shadow-primary/30 group w-full sm:w-auto" asChild>
             <Link href="/signup">
               Start Your Journey
-              <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="ml-2 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-2 transition-transform" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="h-16 px-12 text-xl rounded-full bg-background/50 backdrop-blur-3xl border-border/50" asChild>
+          <Button size="lg" variant="outline" className="h-14 sm:h-16 px-8 sm:px-12 text-lg sm:text-xl rounded-full bg-background/50 backdrop-blur-3xl border-border/50 w-full sm:w-auto" asChild>
             <Link href="#tutorial">
-              <PlayCircle className="mr-2 w-6 h-6 text-primary" />
+              <PlayCircle className="mr-2 w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               Watch Demo
             </Link>
           </Button>
@@ -121,13 +121,13 @@ function ModernFeatures() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1, duration: 0.6 }}
             >
-              <Card className="h-full border-border/50 bg-background/50 backdrop-blur-3xl rounded-[3rem] hover:border-primary/50 transition-all duration-500 group shadow-lg hover:shadow-2xl hover:-translate-y-2">
-                <CardContent className="pt-12 pb-10 flex flex-col items-center text-center px-8">
-                  <div className={cn("mb-8 p-6 rounded-[2rem] transition-all duration-500 group-hover:rotate-6", feature.color)}>
+              <Card className="h-full border-border/50 bg-background/50 backdrop-blur-3xl rounded-[2rem] sm:rounded-[3rem] hover:border-primary/50 transition-all duration-500 group shadow-lg hover:shadow-2xl hover:-translate-y-2">
+                <CardContent className="pt-8 sm:pt-12 pb-6 sm:pb-10 flex flex-col items-center text-center px-6 sm:px-8">
+                  <div className={cn("mb-6 sm:mb-8 p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-500 group-hover:rotate-6", feature.color)}>
                     {feature.icon}
                   </div>
-                  <h3 className="text-2xl font-black mb-4 italic tracking-tight">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed font-medium">
+                  <h3 className="text-xl sm:text-2xl font-black mb-3 sm:mb-4 italic tracking-tight">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-medium">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -153,7 +153,7 @@ function TrustSection() {
                         className="text-center lg:text-left flex flex-col items-center lg:items-start"
                     >
                         <div className="text-primary font-black italic tracking-widest text-xs mb-4 uppercase">Science First</div>
-                        <h2 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tightest leading-none">Built on <br className="hidden md:block" /> Proven Science.</h2>
+                        <h2 className="text-4xl md:text-7xl font-black mb-6 sm:mb-8 italic tracking-tightest leading-none">Built on <br className="hidden md:block" /> Proven Science.</h2>
                         <p className="text-xl text-muted-foreground/80 mb-10 leading-relaxed font-medium">
                             Ground your healing in methodology. We integrate clinical standards like the Stanford GDS into a seamless AI companion experience.
                         </p>
@@ -182,14 +182,14 @@ function TrustSection() {
                         className="relative w-full max-w-xl mx-auto"
                     >
                         <div className="absolute inset-0 bg-primary/20 blur-[120px] opacity-30 animate-pulse" />
-                        <Card className="relative overflow-hidden border-primary/20 bg-background/40 backdrop-blur-3xl shadow-3xl rounded-[4rem] p-10 md:p-14">
+                        <Card className="relative overflow-hidden border-primary/20 bg-background/40 backdrop-blur-3xl shadow-3xl rounded-[2.5rem] sm:rounded-[4rem] p-8 sm:p-14">
                             <div className="mb-10 flex items-center justify-between">
                                 <div className="flex gap-1.5">
                                     {[1, 2, 3, 4, 5].map(i => <Sparkles key={i} className="w-5 h-5 text-amber-500 fill-amber-500" />)}
                                 </div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/70">Stanford GDS</span>
                             </div>
-                            <blockquote className="text-3xl font-black italic mb-10 leading-snug tracking-tighter">
+                            <blockquote className="text-2xl sm:text-3xl font-black italic mb-8 sm:mb-10 leading-snug tracking-tighter">
                                 "The first step to healing is being accurately heard."
                             </blockquote>
                             <div className="flex items-center gap-5">
@@ -223,7 +223,7 @@ function MainContent() {
         isScrolled ? "translate-y-2 px-4" : "px-6"
       )}>
         <div className={cn(
-            "w-full h-full rounded-full border transition-all duration-700 flex items-center px-8",
+            "w-full h-full rounded-full border transition-all duration-700 flex items-center px-4 sm:px-8",
             isScrolled ? "bg-background/80 backdrop-blur-3xl border-border/50 shadow-2xl h-16" : "bg-transparent border-transparent"
         )}>
             <Link href="#" className="flex items-center gap-3 group">
@@ -234,16 +234,16 @@ function MainContent() {
             </Link>
             
             <nav className="ml-auto flex items-center gap-4">
-               <div className="hidden lg:flex items-center gap-8 mr-8">
+               <div className="hidden lg:flex items-center gap-6 mr-6">
                  <Link href="#features" className="text-sm font-black uppercase tracking-widest hover:text-primary transition-colors">Features</Link>
                  <Link href="#tutorial" className="text-sm font-black uppercase tracking-widest hover:text-primary transition-colors">Demo</Link>
                </div>
               <GenZToggle />
               <ThemeToggle />
-              <Button variant="ghost" className="rounded-full px-6 font-black uppercase tracking-widest text-xs hidden sm:flex" asChild>
+              <Button variant="ghost" className="rounded-full px-4 sm:px-6 font-black uppercase tracking-widest text-xs hidden sm:flex" asChild>
                 <Link href="/signin">Sign In</Link>
               </Button>
-              <Button className="rounded-full px-8 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 h-11" asChild>
+              <Button className="rounded-full px-4 sm:px-8 font-black uppercase tracking-widest text-[10px] sm:text-xs shadow-xl shadow-primary/20 h-10 sm:h-11" asChild>
                 <Link href="/signup">Join Now</Link>
               </Button>
             </nav>
@@ -306,7 +306,7 @@ function MainContent() {
         <section className="py-24 text-center relative overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-primary/5 -z-10 blur-[150px]" />
             <div className="container px-6 max-w-4xl mx-auto flex flex-col items-center">
-                <h2 className="text-5xl md:text-8xl font-black mb-10 italic tracking-tightest leading-[0.8]">Your Path <br/><span className="text-primary italic">Starts Here.</span></h2>
+                <h2 className="text-4xl md:text-8xl font-black mb-8 sm:mb-10 italic tracking-tightest leading-[0.8]">Your Path <br/><span className="text-primary italic">Starts Here.</span></h2>
                 <Button size="lg" className="rounded-full h-16 px-12 text-xl shadow-3xl shadow-primary/40 group relative overflow-hidden active:scale-95 transition-all" asChild>
                     <Link href="/signup">
                         <span className="relative z-10">Get Started Now</span>

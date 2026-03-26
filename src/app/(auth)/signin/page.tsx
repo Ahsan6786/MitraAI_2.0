@@ -199,6 +199,12 @@ function AuthForm() {
                 Login here
               </Link>
             </div>
+            <div className="text-center text-sm text-muted-foreground">
+              Are you an admin?{' '}
+              <Link href="/admin-signin" className="underline text-primary font-semibold">
+                Admin Login
+              </Link>
+            </div>
           </CardFooter>
         </form>
       )}

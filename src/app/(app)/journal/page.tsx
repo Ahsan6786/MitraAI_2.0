@@ -33,6 +33,24 @@ import { SOSButton } from '@/components/sos-button';
 import { useRouter } from 'next/navigation';
 import { ToastAction } from '@/components/ui/toast';
 
+import { motion, Variants, AnimatePresence } from 'framer-motion';
+import { GlassCard } from '@/components/glass-card';
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+};
+
 interface JournalEntry {
   id: string;
   createdAt: Timestamp;
@@ -46,6 +64,16 @@ interface JournalEntry {
 
 const TOKEN_COST = 10;
 
+const getMoodEmoji = (mood: string) => {
+    const m = mood.toLowerCase();
+    if (m.includes('happy') || m.includes('joyful')) return '😄';
+    if (m.includes('good') || m.includes('calm')) return '😊';
+    if (m.includes('neutral')) return '😐';
+    if (m.includes('anxious') || m.includes('stressed')) return '😟';
+    if (m.includes('sad') || m.includes('angry')) return '😔';
+    return '✨';
+};
+
 function JournalEntryCard({ entry }: { entry: JournalEntry }) {
     const [isDeleting, setIsDeleting] = useState(false);
     const { toast } = useToast();
@@ -53,9 +81,8 @@ function JournalEntryCard({ entry }: { entry: JournalEntry }) {
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            // Delete Firestore document
             await deleteDoc(doc(db, 'journalEntries', entry.id));
-            toast({ title: "Entry Deleted", description: "Your journal entry has been removed." });
+            toast({ title: "Entry Deleted", description: "Your reflection has been safely removed." });
         } catch (error) {
             console.error("Error deleting entry:", error);
             toast({ title: "Error", description: "Could not delete the entry.", variant: "destructive" });
@@ -65,55 +92,61 @@ function JournalEntryCard({ entry }: { entry: JournalEntry }) {
     };
 
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                            {entry.type === 'text' ? <PenSquare className="w-5 h-5 text-primary" /> : <Mic className="w-5 h-5 text-primary" />}
-                            <span>{entry.createdAt?.toDate().toLocaleDateString()}</span>
-                        </CardTitle>
-                        <CardDescription className="mt-1">
-                            {entry.createdAt?.toDate().toLocaleTimeString()}
-                        </CardDescription>
+        <GlassCard interactive={false} className="border-white/10 overflow-hidden shadow-lg rounded-[2rem]">
+            <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                            {entry.type === 'text' ? <PenSquare className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                        </div>
+                        <div>
+                            <p className="text-white font-black italic tracking-tight">{entry.createdAt?.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{entry.createdAt?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
                     </div>
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                             <Button variant="ghost" size="icon" disabled={isDeleting}>
+                             <Button variant="ghost" size="icon" className="rounded-full hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-colors" disabled={isDeleting}>
                                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                             </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="bg-black/90 backdrop-blur-2xl border-white/10 rounded-[2rem]">
                             <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete your journal entry.
+                            <AlertDialogTitle className="text-2xl font-black italic">Delete this reflection?</AlertDialogTitle>
+                            <AlertDialogDescription className="font-medium">
+                                This memory will be permanently removed from your journey.
                             </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+                            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600 rounded-full">Delete Forever</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
                 </div>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground italic whitespace-pre-wrap">"{entry.content}"</p>
-            </CardContent>
-            <CardFooter className="flex-col items-start gap-2">
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold">Detected Mood:</span>
-                    <Badge variant="secondary" className="capitalize">{entry.mood}</Badge>
-                </div>
-                {entry.reviewed && (
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Reviewed by a doctor. <Link href="/reports" className="underline">View report</Link></span>
+                
+                <p className="text-gray-200 italic font-medium leading-relaxed mb-6 line-clamp-4">"{entry.content}"</p>
+                
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/5">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                        <span className="text-lg">{getMoodEmoji(entry.mood)}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{entry.mood}</span>
                     </div>
-                )}
-            </CardFooter>
-        </Card>
+                    
+                    {entry.reviewed ? (
+                        <Link href="/reports" className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-green-500 hover:text-green-400 transition-colors">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Clinical Review Ready</span>
+                        </Link>
+                    ) : (
+                         <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                            <Loader2 className="w-3.5 h-3.5 animate-pulse" />
+                            <span>Pending Review</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </GlassCard>
     )
 }
 
@@ -164,13 +197,10 @@ function JournalPageContent() {
           throw new Error("Insufficient tokens.");
         }
 
-        // Deduct tokens
         transaction.update(userDocRef, { tokens: increment(-TOKEN_COST) });
 
-        // Get mood from AI
         const moodResult = await predictUserMood({ journalEntry: entry });
 
-        // Create new journal entry
         const newEntryRef = doc(collection(db, 'journalEntries'));
         transaction.set(newEntryRef, {
           userId: user.uid,
@@ -184,7 +214,7 @@ function JournalPageContent() {
           doctorReport: null,
         });
 
-        toast({ title: "Entry Saved", description: `We've logged your entry. Detected mood: ${moodResult.mood}. ${TOKEN_COST} tokens used.` });
+        toast({ title: "Reflection Saved", description: `Captured your mood as ${moodResult.mood}.` });
       });
 
       setEntry('');
@@ -193,10 +223,10 @@ function JournalPageContent() {
       console.error("Error saving entry:", error);
       if (error.message.includes("Insufficient tokens")) {
         toast({
-            title: "Insufficient Tokens",
-            description: "Please ask your doctor for a recharge.",
+            title: "Insufficient Energy",
+            description: "Request a recharge to continue processing your soul-mate reflections.",
             variant: "destructive",
-            action: <ToastAction altText="Message Doctor" onClick={() => router.push('/reports')}>Message Doctor</ToastAction>,
+            action: <ToastAction altText="Recharge" onClick={() => router.push('/reports')}>Recharge</ToastAction>,
         });
       } else {
         toast({ title: "Error saving entry", description: error.message, variant: "destructive" });
@@ -208,90 +238,123 @@ function JournalPageContent() {
 
 
   return (
-    <div className="h-full flex flex-col">
-      <header className="border-b p-3 md:p-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+    <div className="h-full flex flex-col bg-background/50">
+      <header className="border-b border-white/10 p-4 md:p-6 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-4">
             <SidebarTrigger className="md:hidden" />
             <div>
-              <h1 className="text-lg md:text-xl font-bold">Your Private Journal</h1>
-              <p className="text-sm text-muted-foreground">
-                Write down your thoughts to track your mood.
-              </p>
+              <h1 className="text-xl md:text-2xl font-black italic tracking-tight">Personal Journal</h1>
+              <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">A Sacred Space for Your Soul</p>
             </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
             <SOSButton />
             <GenZToggle />
             <ThemeToggle />
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6">
-        <div className="grid gap-8 lg:grid-cols-2">
+      <main className="flex-1 overflow-auto p-4 md:p-10">
+        <div className="max-w-7xl mx-auto grid gap-12 lg:grid-cols-5">
           {/* Left Column: Entry Form */}
-          <div className="space-y-6">
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <PenSquare className="w-6 h-6 text-primary"/> How are you feeling today?
-                    </CardTitle>
-                    <CardDescription>
-                        Write anything that's on your mind. It's completely private. Each analysis costs ${TOKEN_COST} tokens.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <Textarea
-                        placeholder="Start writing here..."
-                        rows={10}
-                        value={entry}
-                        onChange={(e) => setEntry(e.target.value)}
-                        disabled={isSubmitting}
-                    />
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                    <Button onClick={handleSaveTextEntry} disabled={isSubmitting || !entry.trim()}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Save & Analyze
-                    </Button>
-                </CardFooter>
-            </Card>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-3 space-y-8"
+          >
+             <GlassCard interactive={false} className="border-primary/20 rounded-[3rem] overflow-hidden">
+                <div className="p-8">
+                    <div className="space-y-2 mb-8">
+                        <h2 className="text-3xl font-black italic tracking-tighter flex items-center gap-3">
+                            <PenSquare className="w-8 h-8 text-primary"/> 
+                            What's unfolding within?
+                        </h2>
+                        <p className="text-sm text-muted-foreground font-medium">
+                            Share your truth. Your journey is analyzed with care & precision.
+                        </p>
+                    </div>
+                    
+                    <div className="relative group">
+                        <Textarea
+                            placeholder="Pour your thoughts here..."
+                            className="bg-white/5 border-2 border-white/10 rounded-[2rem] p-8 text-lg font-medium min-h-[400px] focus-visible:ring-primary/30 transition-all placeholder:text-muted-foreground/30 leading-relaxed"
+                            value={entry}
+                            onChange={(e) => setEntry(e.target.value)}
+                            disabled={isSubmitting}
+                        />
+                        <div className="absolute bottom-6 right-8 flex items-center gap-4">
+                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">Cost: {TOKEN_COST} Energy</span>
+                             <Button 
+                                onClick={handleSaveTextEntry} 
+                                disabled={isSubmitting || !entry.trim()}
+                                className="rounded-full bg-primary hover:bg-primary/90 text-white font-black italic px-10 h-12 shadow-xl shadow-primary/20 transition-all active:scale-95"
+                             >
+                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Reflection"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </GlassCard>
 
-             <Card className="bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-                        <AlertTriangle className="w-5 h-5"/>
-                        Need Professional Review?
-                    </CardTitle>
-                </CardHeader>
-                 <CardContent>
-                    <p className="text-sm text-amber-700 dark:text-amber-300">
-                       After saving, your entries are sent to a certified doctor for review. You can view their feedback in the <Link href="/reports" className="font-semibold underline">Doctor's Reports</Link> section.
-                    </p>
-                </CardContent>
-             </Card>
-          </div>
+             <motion.div 
+                whileHover={{ y: -5 }}
+                className="p-6 rounded-[2rem] bg-amber-500/10 border border-amber-500/20 backdrop-blur-3xl"
+             >
+                <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-500">
+                        <AlertTriangle className="w-6 h-6"/>
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-black italic text-amber-500 tracking-tight mb-1">Clinical Support Pathway</h3>
+                        <p className="text-sm text-amber-700/80 dark:text-amber-200/60 font-medium leading-relaxed">
+                           Your reflections are securely shared with our network of certified specialists once saved. Clinical insights will appear in your <Link href="/reports" className="text-amber-600 dark:text-amber-400 font-bold underline decoration-2 underline-offset-4">Health Nexus</Link> within 24 hours.
+                        </p>
+                    </div>
+                </div>
+             </motion.div>
+          </motion.div>
 
           {/* Right Column: Past Entries */}
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold">Recent Entries</h2>
-             {isLoadingEntries ? (
-                <div className="flex justify-center items-center h-48">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
-            ) : entries.length === 0 ? (
-                <Card className="text-center p-6">
-                    <BookHeart className="mx-auto w-12 h-12 text-muted-foreground mb-4"/>
-                    <CardTitle>No Entries Yet</CardTitle>
-                    <CardDescription className="mt-2">
-                        Your past journal entries will appear here.
-                    </CardDescription>
-                </Card>
-            ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                    {entries.map(e => <JournalEntryCard key={e.id} entry={e} />)}
-                </div>
-            )}
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2 space-y-8"
+          >
+            <div className="flex items-center justify-between px-2">
+                <h2 className="text-2xl font-black italic tracking-tight">Timeline</h2>
+                <span className="bg-primary/20 text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{entries.length} reflections</span>
+            </div>
+            
+             <div className="max-h-[85vh] overflow-y-auto pr-2 custom-scrollbar">
+                 {isLoadingEntries ? (
+                    <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground">Recalling Memories</p>
+                    </div>
+                ) : entries.length === 0 ? (
+                    <div className="text-center py-20 px-6 border-2 border-dashed border-white/5 rounded-[3rem]">
+                        <BookHeart className="mx-auto w-16 h-16 text-muted-foreground/20 mb-6"/>
+                        <h3 className="text-xl font-black italic text-muted-foreground mb-1">Silence Speaks</h3>
+                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/40">
+                            Begin your chronicle of growth
+                        </p>
+                    </div>
+                ) : (
+                    <motion.div 
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="space-y-6"
+                    >
+                        {entries.map(e => (
+                            <motion.div key={e.id} variants={itemVariants}>
+                                <JournalEntryCard entry={e} />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+             </div>
+          </motion.div>
         </div>
       </main>
     </div>
@@ -324,8 +387,8 @@ export default function JournalPage() {
         return <SectionIntroAnimation 
             onFinish={handleIntroFinish} 
             icon={<BookHeart className="w-full h-full" />}
-            title="Your Journal"
-            subtitle="A private space for your thoughts."
+            title="Chronicles"
+            subtitle="The ink of your soul."
         />;
     }
 

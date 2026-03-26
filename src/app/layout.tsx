@@ -5,9 +5,25 @@ import { Toaster } from '@/components/ui/toaster';
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider';
 
+
 export const metadata: Metadata = {
-  title: 'MitraAI',
-  description: 'Your AI Mental Health Companion',
+  title: 'MitraAI | Your Soul Ally',
+  description: 'The world\'s fastest empathetic AI companion. Real-time support, mood tracking, and cultural heritage dekryption.',
+  keywords: ['AI Mental Health', 'Empathy AI', 'MitraAI', 'Mental Wellness', 'AI Companion', 'Emotional Support'],
+  authors: [{ name: 'Ahsan Imam Khan', url: 'https://github.com/AhsanImamKhan' }],
+  openGraph: {
+    title: 'MitraAI | Your Soul Ally',
+    description: 'The world\'s fastest empathetic AI companion.',
+    url: 'https://mitra-ai.vercel.app', // Placeholder, user will update
+    siteName: 'MitraAI',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MitraAI | Your Soul Ally',
+    description: 'The world\'s fastest empathetic AI companion.',
+  },
 };
 
 const inter = Inter({

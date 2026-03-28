@@ -134,11 +134,11 @@ export default function MoodChatPage() {
             <div className="h-8 w-px bg-white/10 hidden md:block" />
             <div className="flex flex-col">
               <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Neural_Uplink.</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Real-time Sentiment Stream</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1 hidden xs:block">Real-time Sentiment Stream</p>
             </div>
         </div>
-        <div className="flex items-center gap-4">
-             <div className="hidden sm:block">
+        <div className="flex items-center gap-2 sm:gap-4">
+             <div className="hidden md:block">
                 <GenZToggle />
             </div>
             <ThemeToggle />
@@ -166,7 +166,7 @@ export default function MoodChatPage() {
                         </div>
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-black italic tracking-tightest uppercase text-white">Initialize_Session.</h2>
+                        <h2 className="text-3xl sm:text-4xl font-black italic tracking-tightest uppercase text-white">Initialize_Session.</h2>
                         <p className="text-muted-foreground font-medium max-w-sm mx-auto leading-relaxed">
                             Transmit your current neural state. Our synthetic core will analyze the sentiment frequency in real-time.
                         </p>

@@ -163,37 +163,39 @@ export default function ProfilePage() {
                 />
             </div>
 
-            <header className="h-24 shrink-0 px-6 md:px-10 border-b border-white/10 flex items-center justify-between bg-background/40 backdrop-blur-3xl sticky top-0 z-50">
-                <div className="flex items-center gap-5">
-                    <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
-                    <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
+            <header className="h-16 md:h-24 shrink-0 px-4 md:px-10 border-b border-white/10 flex items-center justify-between bg-background/40 backdrop-blur-3xl sticky top-0 z-50">
+                <div className="flex items-center gap-3 md:gap-5">
+                    <SidebarTrigger className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl border border-white/10 hover:bg-primary/10 transition-all" />
+                    <div className="hidden sm:block h-8 w-px bg-white/5 mx-2" />
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">Profile</h1>
-                        <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Biometric Sync Active</span>
+                        <h1 className="text-lg md:text-2xl font-black italic tracking-tighter text-white uppercase">Profile</h1>
+                        <div className="flex items-center gap-1.5">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                            <span className="text-[9px] uppercase font-black tracking-widest text-muted-foreground/60">Profile Synced</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden xs:block">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
 
-            <main className="flex-1 overflow-auto p-6 md:p-12 lg:p-16 flex justify-center items-start">
-                <div className="w-full max-w-4xl space-y-12">
+            <main className="flex-1 overflow-auto p-4 md:p-12 lg:p-16 flex justify-center items-start">
+                <div className="w-full max-w-4xl space-y-8 md:space-y-12">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center space-y-4"
+                        className="text-center space-y-3"
                     >
-                        <h1 className="text-5xl md:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
-                            Identity <span className="text-primary italic">Forge.</span>
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
+                            Profile <span className="text-primary italic">Settings.</span>
                         </h1>
-                        <p className="text-lg text-muted-foreground/80 font-medium leading-relaxed max-w-2xl mx-auto">
-                            Configure your persona and localize your clinical environment for a tailored therapeutic experience.
+                        <p className="text-base md:text-lg text-muted-foreground/80 font-medium leading-relaxed max-w-2xl mx-auto">
+                            Update your personal information and preferences for a better experience.
                         </p>
                     </motion.div>
 
@@ -205,9 +207,9 @@ export default function ProfilePage() {
                                     <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                                     <div className="relative">
                                         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-                                        <Avatar className="w-40 h-40 border-4 border-white/10 shadow-2xl relative z-10 rounded-[2.5rem]">
+                                        <Avatar className="w-28 h-28 sm:w-40 sm:h-40 border-4 border-white/10 shadow-2xl relative z-10 rounded-[2rem] sm:rounded-[2.5rem]">
                                             <AvatarImage src={photoPreview || undefined} className="object-cover" />
-                                            <AvatarFallback className="text-5xl font-black bg-white/5">{userAvatarFallback.toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback className="text-3xl sm:text-5xl font-black bg-white/5">{userAvatarFallback.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <Button
                                             type="button"
@@ -235,11 +237,11 @@ export default function ProfilePage() {
                                 <GlassCard className="p-6 space-y-6">
                                     <div className="flex items-center gap-3">
                                         <Bot className="w-4 h-4 text-primary" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Companion Protocol</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Mitra AI Settings</h4>
                                     </div>
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="companionName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Assigned Designation</Label>
+                                            <Label htmlFor="companionName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">AI Companion Name</Label>
                                             <Input
                                                 id="companionName"
                                                 className="h-12 bg-white/5 border-white/10 rounded-xl focus:border-primary/50 focus:ring-primary/20 transition-all font-bold"
@@ -255,15 +257,15 @@ export default function ProfilePage() {
 
                             {/* Right Column: Detailed Parameters */}
                             <div className="lg:col-span-2 space-y-8">
-                                <GlassCard className="p-8 space-y-8">
+                                <GlassCard className="p-6 md:p-8 space-y-8">
                                     <div className="flex items-center gap-3 border-b border-white/5 pb-6">
                                         <User className="w-5 h-5 text-primary" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Personnel Data</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white">Personal Information</h4>
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="displayName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">FullName</Label>
+                                            <Label htmlFor="displayName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
                                             <Input
                                                 id="displayName"
                                                 className="h-12 bg-white/5 border-white/10 rounded-xl focus:border-primary/50 focus:ring-primary/20 transition-all font-bold"
@@ -289,10 +291,10 @@ export default function ProfilePage() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="state" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Localized State</Label>
+                                            <Label htmlFor="state" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">State</Label>
                                             <Select onValueChange={setState} value={state} disabled={isSubmitting}>
                                                 <SelectTrigger id="state" className="h-12 bg-white/5 border-white/10 rounded-xl focus:border-primary/50 font-bold">
-                                                    <SelectValue placeholder="Select Zone" />
+                                                    <SelectValue placeholder="Select State" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-zinc-900 border-white/10 text-white rounded-xl">
                                                     {allIndianStates.filter(s => s.id !== 'india').map(s => (
@@ -302,7 +304,7 @@ export default function ProfilePage() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="city" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sector (City)</Label>
+                                            <Label htmlFor="city" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">City</Label>
                                             <Input
                                                 id="city"
                                                 className="h-12 bg-white/5 border-white/10 rounded-xl focus:border-primary/50 focus:ring-primary/20 transition-all font-bold"
@@ -315,26 +317,26 @@ export default function ProfilePage() {
                                     </div>
                                 </GlassCard>
 
-                                <GlassCard className="p-8 space-y-8 border-rose-500/20 bg-rose-500/5 hover:border-rose-500/30 transition-colors">
+                                <GlassCard className="p-6 md:p-8 space-y-8 border-rose-500/20 bg-rose-500/5 hover:border-rose-500/30 transition-colors">
                                     <div className="flex items-center gap-3 border-b border-rose-500/10 pb-6">
                                         <Phone className="w-5 h-5 text-rose-400" />
-                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-400">Emergency Override</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-400">Emergency Contact</h4>
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label htmlFor="emergencyContactName" className="text-[10px] font-black uppercase tracking-widest text-rose-400/60 ml-1">Contact Alias</Label>
+                                            <Label htmlFor="emergencyContactName" className="text-[10px] font-black uppercase tracking-widest text-rose-400/60 ml-1">Contact Name</Label>
                                             <Input
                                                 id="emergencyContactName"
                                                 className="h-12 bg-white/5 border-white/10 rounded-xl focus:border-rose-500/50 focus:ring-rose-500/20 transition-all font-bold"
                                                 value={emergencyContactName}
                                                 onChange={(e) => setEmergencyContactName(e.target.value)}
-                                                placeholder="e.g., Guardian"
+                                                placeholder="e.g., John Doe"
                                                 disabled={isSubmitting}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="emergencyContactPhone" className="text-[10px] font-black uppercase tracking-widest text-rose-400/60 ml-1">Direct Frequency (Phone)</Label>
+                                            <Label htmlFor="emergencyContactPhone" className="text-[10px] font-black uppercase tracking-widest text-rose-400/60 ml-1">Phone Number</Label>
                                             <Input
                                                 id="emergencyContactPhone"
                                                 type="tel"
@@ -352,12 +354,12 @@ export default function ProfilePage() {
                                 <Button 
                                     type="submit" 
                                     disabled={isSubmitting} 
-                                    className="w-full h-16 rounded-[1.25rem] bg-white text-black hover:bg-white/90 font-black italic text-xl shadow-2xl transition-all active:scale-[0.98] group"
+                                    className="w-full h-14 sm:h-16 rounded-[1.25rem] bg-white text-black hover:bg-white/90 font-black italic text-lg sm:text-xl shadow-2xl transition-all active:scale-[0.98] group"
                                 >
                                     {isSubmitting ? (
                                         <Loader2 className="mr-2 h-6 w-6 animate-spin" />
                                     ) : (
-                                        <span className="group-hover:tracking-widest transition-all duration-500">SYNCHRONIZE PARAMETERS</span>
+                                        <span className="group-hover:tracking-widest transition-all duration-500 uppercase">Save Changes</span>
                                     )}
                                 </Button>
                             </div>

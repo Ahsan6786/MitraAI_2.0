@@ -263,8 +263,6 @@ export function ChatHistorySidebar({ currentConversationId }: { currentConversat
     }
 
     return (
-        <aside className="h-full w-80 bg-background/40 backdrop-blur-2xl border-r border-white/10 flex-col hidden lg:flex sticky top-0 z-40">
-            <SidebarContent currentConversationId={currentConversationId} />
-        </aside>
+        <SidebarContent currentConversationId={currentConversationId} />
     );
 }

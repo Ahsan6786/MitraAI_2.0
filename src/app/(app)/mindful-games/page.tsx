@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { GenZToggle } from '@/components/genz-toggle';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { GlassCard } from '@/components/glass-card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SOSButton } from '@/components/sos-button';
@@ -145,9 +145,9 @@ function BoxBreathingExercise() {
                 <div className="space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
                         <Wind className="w-3 h-3 text-primary" />
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Neural Calibration</span>
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Breathing</span>
                     </div>
-                    <h3 className="text-4xl font-black italic tracking-tightest text-white leading-tight">Box Breathing.</h3>
+                    <h3 className="text-4xl font-black italic tracking-tightest text-white leading-tight">Calm Breathing</h3>
                     <p className="text-muted-foreground font-medium leading-relaxed max-w-sm">
                         Synchronize your neural rhythm with a controlled respiratory pattern. Stabilize your core frequency.
                     </p>
@@ -180,7 +180,7 @@ function BoxBreathingExercise() {
                         )}
                     >
                         {isActive ? <Pause className="mr-3 h-4 w-4 fill-current"/> : <Play className="mr-3 h-4 w-4 fill-current"/>}
-                        {isActive ? 'PAUSE PROTOCOL' : 'INITIALIZE SYNC'}
+                        {isActive ? 'STOP' : 'START'}
                     </Button>
                      <Button 
                         onClick={handleReset} 
@@ -236,12 +236,12 @@ function GuessTheNumberGame() {
         setAttempts(prev => prev + 1);
 
         if (numGuess === secretNumber) {
-            setMessage(`Neural match confirmed. Target [${secretNumber}] identified in ${attempts + 1} cycles.`);
+            setMessage(`Correct! You guessed it in ${attempts + 1} tries.`);
             setIsCorrect(true);
         } else if (numGuess < secretNumber) {
-            setMessage('Target above current projection.');
+            setMessage('Try a higher number.');
         } else {
-            setMessage('Target below current projection.');
+            setMessage('Try a lower number.');
         }
         setGuess('');
     };
@@ -252,15 +252,15 @@ function GuessTheNumberGame() {
                 <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
                     <Brain className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Numerical Sync</h3>
-                <p className="text-muted-foreground font-medium text-sm tracking-wide">Decrypt the high-frequency integer (01-100).</p>
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Number Guess</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Guess the number (1-100).</p>
             </div>
 
             <form onSubmit={handleGuess} className="space-y-8">
                 <div className="flex gap-4">
                     <Input
                         type="number"
-                        placeholder="INT_ID..."
+                        placeholder="GUESS..."
                         className="h-16 bg-white/5 border-white/10 rounded-2xl focus:border-primary/50 focus:ring-primary/20 transition-all font-black italic text-xl px-6 text-white"
                         value={guess}
                         onChange={(e) => setGuess(e.target.value)}
@@ -271,7 +271,7 @@ function GuessTheNumberGame() {
                         disabled={isCorrect || !guess}
                         className="h-16 px-10 rounded-2xl bg-white text-black font-black italic tracking-widest hover:bg-white/90 active:scale-95 transition-all"
                     >
-                        DECRYPT
+                        GUESS
                     </Button>
                 </div>
                 
@@ -387,11 +387,11 @@ function MemoryMatchGame() {
         <GlassCard className="w-full max-w-2xl mx-auto p-12 space-y-12 rounded-[3.5rem] relative overflow-hidden">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Neural Patterns</h3>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Match visual identifiers</p>
+                    <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Memory Match</h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Match the pairs</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Sync Cycles</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Moves</p>
                     <p className="text-2xl font-black italic text-white">{moves < 10 ? `0${moves}` : moves}</p>
                 </div>
             </div>
@@ -513,8 +513,8 @@ function WordUnscrambleGame() {
                 <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
                     <Languages className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Lexical Decrypt</h3>
-                <p className="text-muted-foreground font-medium text-sm tracking-wide">Restore the original semantic sequence.</p>
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Word Unscramble</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Find the word.</p>
             </div>
 
             <div className="py-8 px-4 bg-white/5 rounded-[2rem] border border-white/10 text-center">
@@ -547,7 +547,7 @@ function WordUnscrambleGame() {
                         disabled={isCorrect || !guess}
                         className="h-16 px-10 rounded-2xl bg-white text-black font-black italic tracking-widest hover:bg-white/90 active:scale-95 transition-all"
                     >
-                        SYNC
+                        GUESS
                     </Button>
                 </div>
                 
@@ -637,9 +637,9 @@ function TicTacToeGame() {
     };
 
     const renderStatus = () => {
-        if (winner) return `Protocol Result: ${winner} Dominance`;
-        if (isDraw) return "Neural Stalemate";
-        return isXNext ? "User Input Required" : "AI Processing...";
+        if (winner) return `Winner: ${winner}`;
+        if (isDraw) return "It's a Draw!";
+        return isXNext ? "Your Turn" : "AI is thinking...";
     };
     
     return (
@@ -648,8 +648,8 @@ function TicTacToeGame() {
                 <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center mx-auto border border-primary/20">
                     <Gamepad2 className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Grid Contention</h3>
-                <p className="text-muted-foreground font-medium text-sm tracking-wide">Outmaneuver the synthetic logic core.</p>
+                <h3 className="text-3xl font-black italic tracking-tightest text-white uppercase">Tic-Tac-Toe</h3>
+                <p className="text-muted-foreground font-medium text-sm tracking-wide">Play against the computer.</p>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
@@ -681,7 +681,7 @@ function TicTacToeGame() {
 
                 <Button onClick={resetGame} variant="ghost" className="w-full h-14 border border-white/10 rounded-2xl font-black italic text-xs tracking-widest text-white hover:bg-white/5">
                     <RotateCcw className="mr-3 h-4 w-4" />
-                    RESET GRID
+                    RESET GAME
                 </Button>
             </div>
         </GlassCard>
@@ -691,35 +691,35 @@ function TicTacToeGame() {
 const games = [
     { 
         id: 'guess-the-number', 
-        name: 'Numerical Sync', 
+        name: 'Number Guess', 
         component: <GuessTheNumberGame />, 
         icon: Brain,
-        category: 'Cognitive',
-        description: "Decrypt the high-frequency integer. Enhance your focal precision through numerical deduction." 
+        category: 'Focus',
+        description: "Guess the right number to train your focus." 
     },
     { 
         id: 'memory-match', 
-        name: 'Neural Patterns', 
+        name: 'Memory Match', 
         component: <MemoryMatchGame />, 
         icon: Sparkles,
         category: 'Memory',
-        description: "Visualize and match core identifiers. Strengthen your visual working memory cycles." 
+        description: "Match the pairs to test your memory." 
     },
     { 
         id: 'word-unscramble', 
-        name: 'Lexical Decrypt', 
+        name: 'Word Unscramble', 
         component: <WordUnscrambleGame />, 
         icon: Languages,
-        category: 'Linguistic',
-        description: "Restore original semantic sequences. Refine your linguistic processing and pattern recognition." 
+        category: 'Verbal',
+        description: "Unscramble letters to find the word." 
     },
     { 
         id: 'tic-tac-toe', 
-        name: 'Grid Contention', 
+        name: 'Tic-Tac-Toe', 
         component: <TicTacToeGame />, 
         icon: Gamepad2,
-        category: 'Strategy',
-        description: "Challenge the synthetic logic core. Navigate a finite state machine towards victory." 
+        category: 'Logic',
+        description: "A classic game of strategy." 
     },
 ];
 
@@ -757,8 +757,8 @@ function MindfulGamesPageContent() {
             <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
             <div className="h-8 w-px bg-white/10 hidden md:block" />
             <div className="flex flex-col">
-              <h1 className="text-xl font-black italic tracking-tighter leading-none">NEURAL_STATION.</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Cognitive Calibration Hub</p>
+              <h1 className="text-xl font-black italic tracking-tighter leading-none">Wellness Games</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Train Your Mind</p>
             </div>
         </div>
         <div className="flex items-center gap-4">
@@ -788,7 +788,7 @@ function MindfulGamesPageContent() {
                                 className="h-12 border border-white/10 rounded-2xl px-6 font-black italic text-xs tracking-widest text-white hover:bg-white/5 active:scale-95 transition-all"
                             >
                                 <ArrowLeft className="mr-3 h-4 w-4" />
-                                RETURN_TO_HUB
+                                BACK
                             </Button>
                             
                             <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
@@ -816,15 +816,15 @@ function MindfulGamesPageContent() {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                                 </span>
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Calibration Online</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Ready</span>
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black italic tracking-tightest leading-none text-white">
+                            <h1 className="text-4xl md:text-8xl font-black italic tracking-tightest leading-none text-white">
                                 FOCUS.<br/>
                                 <span className="text-primary">FLOW.</span><br/>
                                 FEEL.
                             </h1>
-                            <p className="text-xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
-                                Access high-frequency tools designed to reset your neural pathways. Choose a calibration protocol below.
+                            <p className="text-base md:text-xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
+                                Simple exercises and games to help you relax and stay sharp.
                             </p>
                         </div>
 
@@ -832,20 +832,20 @@ function MindfulGamesPageContent() {
                         <div className="space-y-10">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-4">
                                 <div>
-                                    <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Rhythm Protocols</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Guided Sensory Tuning</p>
+                                    <h2 className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase mb-1">Relaxation</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Stay Calm</p>
                                 </div>
                             </div>
 
                             <Tabs defaultValue="box-breathing" className="w-full">
-                                <TabsList className="flex items-center gap-2 bg-white/5 p-1 rounded-[1.5rem] border border-white/10 mb-12 w-fit">
-                                    <TabsTrigger value="box-breathing" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                <TabsList className="flex items-center gap-2 bg-white/5 p-1 rounded-[1.5rem] border border-white/10 mb-12 w-full md:w-fit overflow-x-auto">
+                                    <TabsTrigger value="box-breathing" className="flex-1 md:flex-none rounded-2xl px-4 md:px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all whitespace-nowrap">
                                         BREATHING
                                     </TabsTrigger>
-                                    <TabsTrigger value="meditation" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                    <TabsTrigger value="meditation" className="flex-1 md:flex-none rounded-2xl px-4 md:px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all whitespace-nowrap">
                                         MEDITATION
                                     </TabsTrigger>
-                                    <TabsTrigger value="listening" className="rounded-2xl px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all">
+                                    <TabsTrigger value="listening" className="flex-1 md:flex-none rounded-2xl px-4 md:px-8 h-12 font-black italic text-xs tracking-widest data-[state=active]:bg-white data-[state=active]:text-black transition-all whitespace-nowrap">
                                         LISTENING
                                     </TabsTrigger>
                                 </TabsList>
@@ -858,7 +858,7 @@ function MindfulGamesPageContent() {
                                         <GlassCard className="text-center p-20 rounded-[3rem] border-dashed border-white/20">
                                             <Music className="w-16 h-16 text-white/10 mx-auto mb-6" />
                                             <h3 className="text-2xl font-black italic uppercase mb-2">Guided Meditation</h3>
-                                            <p className="text-muted-foreground">Neural frequency tuning coming soon.</p>
+                                            <p className="text-muted-foreground">More features coming soon.</p>
                                         </GlassCard>
                                     </TabsContent>
                                     <TabsContent value="listening">
@@ -875,8 +875,8 @@ function MindfulGamesPageContent() {
                         {/* Games Grid */}
                         <div className="space-y-12">
                             <div>
-                                <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Cognitive Terminals</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Operational Logic Testing</p>
+                                <h2 className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase mb-1">Brain Games</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Have Fun</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -909,7 +909,7 @@ function MindfulGamesPageContent() {
                                                         {game.description}
                                                     </p>
                                                     <div className="pt-2">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">INITIALIZE_SEQUENCE //</span>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">PLAY //</span>
                                                     </div>
                                                 </div>
 
@@ -931,35 +931,5 @@ function MindfulGamesPageContent() {
 }
 
 export default function MindfulGamesPage() {
-    const [isClient, setIsClient] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
-    const SESSION_KEY = 'hasSeenGamesIntro';
-
-    useEffect(() => {
-        setIsClient(true);
-        const hasSeen = sessionStorage.getItem(SESSION_KEY);
-        if (hasSeen) {
-            setShowIntro(false);
-        }
-    }, []);
-
-    const handleIntroFinish = () => {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        setShowIntro(false);
-    };
-
-    if (!isClient) {
-        return null;
-    }
-    
-    if (showIntro) {
-        return <SectionIntroAnimation 
-            onFinish={handleIntroFinish} 
-            icon={<Puzzle className="w-full h-full" />}
-            title="Mindful Games"
-            subtitle="Engage your mind and find calm."
-        />;
-    }
-
     return <MindfulGamesPageContent />;
 }

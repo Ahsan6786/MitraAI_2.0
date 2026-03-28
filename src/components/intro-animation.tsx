@@ -13,17 +13,8 @@ const TOTAL_DURATION = 2500; // 2.5 seconds total
 
 export default function IntroAnimation({ onFinish }: IntroAnimationProps) {
     const [animationState, setAnimationState] = useState('entering');
-    const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
      useEffect(() => {
-        // Preload and play audio
-        const audioInstance = new Audio('/intro-sound.mp3');
-        audioInstance.play().catch(error => {
-            // Audio might be missing (404) or autoplay might be blocked
-            console.log("Intro audio info: Playback skipped (missing file or browser restriction)");
-        });
-        setAudio(audioInstance);
-
         const finishTimer = setTimeout(() => {
             setAnimationState('exiting');
         }, TOTAL_DURATION - 500); // Start fade out before finish
@@ -35,9 +26,6 @@ export default function IntroAnimation({ onFinish }: IntroAnimationProps) {
         return () => {
             clearTimeout(finishTimer);
             clearTimeout(unmountTimer);
-            if (audioInstance) {
-                audioInstance.pause();
-            }
         };
     }, [onFinish]);
 

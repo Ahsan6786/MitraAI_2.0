@@ -41,7 +41,7 @@ function ModernHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl md:text-7xl lg:text-8xl font-black tracking-tightest mb-6 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent italic leading-[0.95]"
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tightest mb-6 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent italic leading-[0.95]"
         >
           Meet Your <br />
           <span className="text-primary italic">Soul Ally</span>
@@ -60,9 +60,9 @@ function ModernHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0"
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0 mt-4"
         >
-          <Button size="lg" className="h-14 sm:h-16 px-8 sm:px-12 text-lg sm:text-xl rounded-full shadow-2xl shadow-primary/30 group w-full sm:w-auto" asChild>
+          <Button size="lg" className="h-14 sm:h-16 px-8 sm:px-12 text-lg sm:text-xl rounded-full shadow-2xl shadow-primary/30 group w-full sm:w-auto flex items-center justify-center" asChild>
             <Link href="/signup">
               Start Your Journey
               <ArrowRight className="ml-2 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-2 transition-transform" />
@@ -228,17 +228,19 @@ function MainContent() {
         )}>
             <Link href="#" className="flex items-center gap-3 group">
               <div className="bg-primary p-2 rounded-2xl group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
-                 <Logo className="h-5 w-5 text-white" />
+              <Logo className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-black tracking-tightest italic">MitraAI</span>
+              <span className="text-2xl font-black tracking-tightest italic hidden sm:block">MitraAI</span>
             </Link>
             
-            <nav className="ml-auto flex items-center gap-4">
+            <nav className="ml-auto flex items-center gap-2 sm:gap-4">
                <div className="hidden lg:flex items-center gap-6 mr-6">
                  <Link href="#features" className="text-sm font-black uppercase tracking-widest hover:text-primary transition-colors">Features</Link>
                  <Link href="#tutorial" className="text-sm font-black uppercase tracking-widest hover:text-primary transition-colors">Demo</Link>
                </div>
-              <GenZToggle />
+              <div className="hidden md:flex items-center gap-2">
+                <GenZToggle />
+              </div>
               <ThemeToggle />
               <Button variant="ghost" className="rounded-full px-4 sm:px-6 font-black uppercase tracking-widest text-xs hidden sm:flex" asChild>
                 <Link href="/signin">Sign In</Link>

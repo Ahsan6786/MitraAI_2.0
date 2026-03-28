@@ -77,12 +77,12 @@ const TaskCard = ({ task, status, onComplete, index }: { task: Task, status: { c
                         {status.rewarded ? (
                             <div className="flex items-center gap-3 text-emerald-400 font-black italic text-[10px] tracking-widest uppercase bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-2xl">
                                 <CheckCircle2 className="w-4 h-4" />
-                                SESSION_CALIBRATED_&_REWARDED
+                                TASK_REWARDED
                             </div>
                         ) : status.completed ? (
                             <div className="flex items-center gap-3 text-amber-400 font-black italic text-[10px] tracking-widest uppercase bg-amber-500/5 border border-amber-500/20 p-4 rounded-2xl">
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                PENDING_NEURAL_VERIFICATION
+                                VERIFYING...
                             </div>
                         ) : (
                             <Button 
@@ -94,7 +94,7 @@ const TaskCard = ({ task, status, onComplete, index }: { task: Task, status: { c
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 ) : (
                                     <>
-                                        {task.actionUrl ? 'EXECUTE_PROTOCOL' : 'MARK_AS_RESOLVED'}
+                                        {task.actionUrl ? 'START TASK' : 'COMPLETE'}
                                         <ArrowRight className="ml-2 h-4 w-4" />
                                     </>
                                 )}
@@ -138,12 +138,12 @@ function RewardsPageContent() {
             }, { merge: true });
 
             toast({
-                title: "PROTOCOL_SUBMITTED",
-                description: "Submission logged. Awaiting neural verification.",
+                title: "TASK_SUBMITTED",
+                description: "Submission logged. Verification in progress.",
             });
         } catch (error: any) {
             console.error("Error completing task:", error);
-            toast({ title: "SYNC_ERROR", description: "Verification signal lost.", variant: "destructive" });
+            toast({ title: "SYNC_ERROR", description: "Signal lost. Try again.", variant: "destructive" });
         }
     };
     
@@ -167,8 +167,8 @@ function RewardsPageContent() {
                     <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
                     <div className="h-8 w-px bg-white/10 hidden md:block" />
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Rewards_Station.</h1>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Activity Calibration Hub</p>
+                        <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">My Rewards</h1>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Earn tokens and track progress</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -185,20 +185,20 @@ function RewardsPageContent() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                     >
-                        <GlassCard className="p-10 md:p-16 rounded-[4rem] border-white/10 relative overflow-hidden group">
+                        <GlassCard className="p-8 md:p-16 rounded-[3rem] border-white/10 relative overflow-hidden group">
                            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                             <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                                 <div className="space-y-8">
                                     <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/10">
                                         <Trophy className="w-5 h-5 text-amber-400" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Elite_Contributor</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Mitra Member</span>
                                     </div>
                                     <h1 className="text-6xl md:text-7xl lg:text-8xl font-black italic tracking-tightest leading-none uppercase">
                                         EARN.<br/>
-                                        <span className="text-primary">EVOLVE.</span>
+                                        <span className="text-primary">REWARD.</span>
                                     </h1>
                                     <p className="text-xl text-muted-foreground font-medium max-w-md leading-relaxed">
-                                        Complete neural benchmarks to optimize your standing within the MitraAI collective.
+                                        Complete daily tasks to earn tokens and level up your wellness journey.
                                     </p>
                                 </div>
                                 <div className="flex justify-center md:justify-end">
@@ -208,13 +208,13 @@ function RewardsPageContent() {
                                             transition={{ duration: 4, repeat: Infinity }}
                                             className="absolute inset-0 bg-primary/20 blur-3xl rounded-full"
                                         />
-                                        <div className="relative w-64 h-64 bg-white/5 border border-white/10 rounded-[4rem] flex flex-col items-center justify-center p-8 backdrop-blur-xl group-hover:border-primary/40 transition-all duration-700">
-                                            <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
-                                                <Coins className="w-8 h-8 text-primary" />
+                                            <div className="relative w-64 h-64 bg-white/5 border border-white/10 rounded-[3rem] flex flex-col items-center justify-center p-8 backdrop-blur-xl group-hover:border-primary/40 transition-all duration-700">
+                                                <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
+                                                    <Coins className="w-8 h-8 text-primary" />
+                                                </div>
+                                                <span className="text-5xl font-black italic tracking-tighter text-white">READY</span>
+                                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-2">Check your tasks</span>
                                             </div>
-                                            <span className="text-5xl font-black italic tracking-tighter text-white">READY</span>
-                                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-2">To Analyze submissions</span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -224,15 +224,15 @@ function RewardsPageContent() {
                     <div className="space-y-12">
                          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
                             <div>
-                                <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Available Missions</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Active Calibrations</p>
+                                <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Daily Tasks</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Complete for rewards</p>
                             </div>
                         </div>
 
                         {isLoading ? (
                             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
                                 <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 italic">Syncing_Task_Stream...</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 italic">Loading Tasks...</span>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

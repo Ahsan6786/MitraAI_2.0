@@ -293,7 +293,9 @@ body {
   html, body {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    width: 100%;
     max-width: 100vw;
+    position: relative;
   }
   * {
     @apply border-border;

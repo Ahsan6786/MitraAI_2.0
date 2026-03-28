@@ -112,13 +112,13 @@ const AppointmentCard = ({ booking, onCancel }: { booking: Booking, onCancel: (i
                 <div className="flex items-center gap-3 w-full md:w-auto pt-6 md:pt-0 border-t md:border-t-0 border-white/5">
                     {booking.appointment_status === 'Pending' && (
                         <>
-                            <Button variant="ghost" size="sm" onClick={() => onCancel(booking.id)} className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/10 hover:text-rose-400">Abort Request</Button>
-                            <Button variant="secondary" size="sm" className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest px-6">Analysis</Button>
+                            <Button variant="ghost" size="sm" onClick={() => onCancel(booking.id)} className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/10 hover:text-rose-400">Cancel Request</Button>
+                            <Button variant="secondary" size="sm" className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest px-6">View Details</Button>
                         </>
                     )}
                     {booking.appointment_status === 'Confirmed' && (
                         <>
-                            <Button variant="ghost" size="sm" className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest">Relocate</Button>
+                            <Button variant="ghost" size="sm" className="h-11 rounded-xl text-[10px] font-black uppercase tracking-widest">Change Time</Button>
                             <Button size="sm" className="h-11 rounded-xl bg-white text-black hover:bg-white/90 text-[10px] font-black uppercase tracking-widest px-8 shadow-xl">Attend Session</Button>
                         </>
                     )}
@@ -197,10 +197,10 @@ export default function MyAppointmentsPage() {
             await updateDoc(bookingRef, {
                 appointment_status: 'Cancelled'
             });
-            toast({ title: "Operation Terminated", description: "The session request has been successfully retracted." });
+            toast({ title: "Session Cancelled", description: "Your appointment request has been removed." });
         } catch (error) {
             console.error("Error cancelling booking: ", error);
-            toast({ title: "Error", description: "Could not retract the request.", variant: "destructive" });
+            toast({ title: "Error", description: "Could not cancel the request.", variant: "destructive" });
         }
     };
 
@@ -239,10 +239,10 @@ export default function MyAppointmentsPage() {
                     <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
                     <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-black italic tracking-tighter text-white">Registry</h1>
+                        <h1 className="text-xl md:text-2xl font-black italic tracking-tighter text-white">My Sessions</h1>
                         <div className="flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Live Schedule Synced</span>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Calendar Synced</span>
                         </div>
                     </div>
                 </div>
@@ -260,11 +260,11 @@ export default function MyAppointmentsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4"
                     >
-                        <h1 className="text-4xl md:text-5xl font-black italic tracking-tightest leading-tight text-white capitalize">
+                        <h1 className="text-3xl md:text-5xl font-black italic tracking-tightest leading-tight text-white capitalize">
                             Track Your <span className="text-primary italic">Journey.</span>
                         </h1>
-                        <p className="text-lg text-muted-foreground/80 font-medium leading-relaxed max-w-2xl">
-                            Monitor your clinical engagements and psychological milestones within our encrypted secure scheduling portal.
+                        <p className="text-base md:text-lg text-muted-foreground/80 font-medium leading-relaxed max-w-2xl">
+                            Monitor your counselling sessions and progress within your secure schedule.
                         </p>
                     </motion.div>
 
@@ -279,9 +279,9 @@ export default function MyAppointmentsPage() {
                         </div>
                     ) : (
                          <Tabs defaultValue="upcoming" className="w-full">
-                            <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-16 max-w-sm">
-                                <TabsTrigger value="upcoming" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black text-white text-[10px] font-black uppercase tracking-widest transition-all">Engagements</TabsTrigger>
-                                <TabsTrigger value="past" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black text-white text-[10px] font-black uppercase tracking-widest transition-all">Archives</TabsTrigger>
+                            <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-2xl h-14 md:h-16 w-full max-w-sm">
+                                <TabsTrigger value="upcoming" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black text-white text-[10px] font-black uppercase tracking-widest transition-all">Upcoming</TabsTrigger>
+                                <TabsTrigger value="past" className="flex-1 rounded-xl data-[state=active]:bg-white data-[state=active]:text-black text-white text-[10px] font-black uppercase tracking-widest transition-all">Past Sessions</TabsTrigger>
                             </TabsList>
                             
                             <TabsContent value="upcoming" className="mt-12 focus-visible:ring-0">
@@ -291,9 +291,9 @@ export default function MyAppointmentsPage() {
                                             <CalendarClock className="w-12 h-12 text-primary opacity-60"/>
                                         </div>
                                         <div className="space-y-4">
-                                            <h3 className="text-2xl font-black italic tracking-tight text-white">Registry Empty</h3>
-                                            <p className="text-muted-foreground font-medium">You currently have no active clinical engagements scheduled.</p>
-                                            <Button asChild className="h-12 rounded-xl bg-white text-black hover:bg-white/90 font-black italic px-8 shadow-xl mt-4"><Link href="/booking">Initiate Protocol</Link></Button>
+                                            <h3 className="text-2xl font-black italic tracking-tight text-white">No Sessions Yet</h3>
+                                            <p className="text-muted-foreground font-medium">You currently have no active sessions scheduled.</p>
+                                            <Button asChild className="h-12 rounded-xl bg-white text-black hover:bg-white/90 font-black italic px-8 shadow-xl mt-4"><Link href="/booking">Book a Session</Link></Button>
                                         </div>
                                     </GlassCard>
                                 ) : (
@@ -307,7 +307,7 @@ export default function MyAppointmentsPage() {
                                             <div className="space-y-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-1 h-6 bg-amber-400 rounded-full" />
-                                                    <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-400/80">Pending Validation</h2>
+                                                    <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-400/80">Pending Confirmation</h2>
                                                 </div>
                                                 <div className="space-y-4">
                                                     {pending.map(booking => <AppointmentCard key={booking.id} booking={booking} onCancel={handleCancelBooking} />)}

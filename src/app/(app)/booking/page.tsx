@@ -394,9 +394,11 @@ export default function BookingPage() {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden xs:block">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
@@ -408,7 +410,7 @@ export default function BookingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center space-y-4 max-w-3xl mx-auto"
                     >
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
+                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
                             Professional <span className="text-primary italic">Soul Care.</span>
                         </h1>
                         <p className="text-xl text-muted-foreground/80 font-medium leading-relaxed">
@@ -449,13 +451,13 @@ export default function BookingPage() {
                                         
                                         <div className="p-8 flex flex-col h-full space-y-8 relative z-10">
                                             <div className="flex items-center gap-5">
-                                                <div className="relative">
-                                                     <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-transparent rounded-[1.5rem] opacity-20 group-hover:opacity-40 transition-opacity" />
-                                                     <Avatar className="w-16 h-16 rounded-2xl border-2 border-white/10 shadow-lg relative z-10">
-                                                        <AvatarImage src={c.avatarUrl} alt={c.name} />
-                                                        <AvatarFallback className="bg-white/5 text-xl font-black">{c.name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                </div>
+                                                 <div className="relative shrink-0">
+                                                      <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-transparent rounded-[1.5rem] opacity-20 group-hover:opacity-40 transition-opacity" />
+                                                      <Avatar className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl border-2 border-white/10 shadow-lg relative z-10">
+                                                         <AvatarImage src={c.avatarUrl} alt={c.name} />
+                                                         <AvatarFallback className="bg-white/5 text-xl font-black">{c.name.charAt(0)}</AvatarFallback>
+                                                     </Avatar>
+                                                 </div>
                                                 <div>
                                                     <h3 className="text-xl font-black italic tracking-tight text-white group-hover:text-primary transition-colors">{c.name}</h3>
                                                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Clinical Specialist</p>

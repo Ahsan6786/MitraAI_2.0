@@ -161,7 +161,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
                 <div className="flex flex-col">
                     <span className="text-2xl font-black italic tracking-tightest leading-none">MitraAI</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">Premium AI</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mt-1">Your Wellness Ally</span>
                 </div>
               </Link>
               {userType === 'user' && <UsageTracker />}
@@ -206,26 +206,16 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/talk'}>
                     <Link href="/talk" onClick={handleLinkClick} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <Phone />
                         <span>Talk to Mitra</span>
-                      </div>
+                    </div>
                       <Trophy className="w-4 h-4 text-amber-500" />
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 
-                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={pathname.startsWith('/culture')}>
-                    <Link href="/culture" onClick={handleLinkClick} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2">
-                        <LandPlot />
-                        <span>Our Culture</span>
-                      </div>
-                      <Trophy className="w-4 h-4 text-amber-500" />
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+
                  <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname.startsWith('/community') || pathname.startsWith('/groups') || pathname.startsWith('/friends')}>
                     <Link href="/community" onClick={handleLinkClick} className="flex items-center justify-between w-full">
@@ -333,14 +323,6 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={pathname === '/news'}>
-                    <Link href="/news" onClick={handleLinkClick}>
-                      <Newspaper />
-                      <span>AI News</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === '/therapy'}>
                     <Link href="/therapy" onClick={handleLinkClick}>
@@ -365,6 +347,17 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                     <Link href="/mindful-games" onClick={handleLinkClick}>
                       <Puzzle />
                       <span>Mindful Games</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === '/hand-sense'}
+                  >
+                    <Link href="/hand-sense" onClick={handleLinkClick}>
+                      <Camera className="text-primary" />
+                      <span>Hand Sense</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -415,6 +408,11 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
                         Profile
                       </Link>
                   </Button>
+                  <div className="flex items-center justify-center bg-white/5 rounded-full px-4">
+                      <GenZToggle />
+                  </div>
+              </div>
+              <div className="grid grid-cols-1 gap-2 mt-2">
                   <Button variant="ghost" size="sm" onClick={handleSignOut} className="rounded-full justify-start h-10 px-4 hover:bg-destructive/10 hover:text-destructive transition-all">
                     <LogOut className="mr-2 h-4 w-4" />
                     Exit

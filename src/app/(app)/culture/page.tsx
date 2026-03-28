@@ -81,12 +81,14 @@ function CulturePageContent() {
                     <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
                     <div className="h-8 w-px bg-white/10 hidden md:block" />
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Collective_Soul.</h1>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Cultural Neural Network</p>
+                        <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Our Culture</h1>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1 hidden xs:block">Explore India</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <GenZToggle />
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="hidden md:flex">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                     <SOSButton />
                 </div>
@@ -103,16 +105,16 @@ function CulturePageContent() {
                         >
                             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
                                 <Globe className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">India // Infinite Spectrum</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Indian States</span>
                             </div>
                             
-                            <h2 className="text-7xl md:text-9xl font-black italic tracking-tightest leading-[0.85] text-white uppercase">
-                                THE HEART<br/>
-                                <span className="text-primary">OF BHARAT.</span>
+                            <h2 className="text-4xl sm:text-7xl md:text-9xl font-black italic tracking-tightest leading-[0.85] text-white uppercase">
+                                DISCOVER<br/>
+                                <span className="text-primary">INDIA.</span>
                             </h2>
                             
-                            <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
-                                Synchronize with the unique traditions, vibrant frequencies, and high-fidelity heritage that define each node of our collective consciousness.
+                            <p className="text-lg md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
+                                Explore the rich heritage and traditions of India. Each state offers a unique story and vibrant culture.
                             </p>
 
                             <div className="flex flex-wrap gap-4 pt-4">
@@ -141,16 +143,16 @@ function CulturePageContent() {
                     <div className="space-y-16">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
                             <div>
-                                <h2 className="text-4xl font-black italic tracking-tighter uppercase mb-2">Regional Nodes</h2>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Select a neural point to dekrypt heritage</p>
+                                <h2 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase mb-2">States & Territories</h2>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Select a state to explore</p>
                             </div>
                         </div>
 
-                        <motion.div 
+                            <motion.div 
                             variants={containerVariants}
                             initial="hidden"
                             animate="show"
-                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8"
+                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8"
                         >
                             {allIndianStates.map((state, i) => {
                                 const isAvailable = availableStateIds.has(state.id);
@@ -174,7 +176,7 @@ function CulturePageContent() {
                                                       {state.name[0]}
                                                     </div>
                                                     <h3 className="text-lg font-black italic tracking-tighter uppercase mb-1 relative z-10 group-hover:text-primary transition-colors">{state.name}</h3>
-                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/30 relative z-10 group-hover:text-primary/60">DEKRYPT_NODE_ &rarr;</span>
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/30 relative z-10 group-hover:text-primary/60">Explore &rarr;</span>
 
                                                     {/* Background Pattern */}
                                                     <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-700">
@@ -195,7 +197,7 @@ function CulturePageContent() {
                                                        {state.name[0]}
                                                     </div>
                                                     <h3 className="text-sm font-black italic tracking-tighter uppercase text-white/40 mb-1">{state.name}</h3>
-                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/20">NODE_OFFLINE</span>
+                                                    <span className="text-[7px] font-black uppercase tracking-widest text-white/20">COMING SOON</span>
                                                 </GlassCard>
                                             </div>
                                         )}

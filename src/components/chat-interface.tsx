@@ -311,13 +311,15 @@ export default function ChatInterface({ conversationId }: { conversationId?: str
             </h1>
             <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Soul Ally Syncing</span>
+                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60 hidden xs:block">Soul Ally Syncing</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <SOSButton />
-          <GenZToggle />
+          <div className="hidden md:flex items-center gap-2">
+            <GenZToggle />
+          </div>
           <ThemeToggle />
         </div>
       </header>

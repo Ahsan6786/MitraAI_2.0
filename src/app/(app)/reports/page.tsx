@@ -126,7 +126,7 @@ const ReportCard = ({ report }: { report: Report }) => {
                 <div className="flex items-center gap-4 mb-12 border-b border-white/10 pb-8">
                    <Logo className="w-12 h-12 text-primary"/>
                    <div>
-                        <h1 className="text-3xl font-black italic tracking-tighter">MitraAI Premium</h1>
+                        <h1 className="text-3xl font-black italic tracking-tighter">MitraAI Reports</h1>
                         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Certified Wellness Report</p>
                    </div>
                 </div>
@@ -138,20 +138,20 @@ const ReportCard = ({ report }: { report: Report }) => {
                     {report.type === 'journal' ? (
                         <>
                             <div className="bg-white/5 p-8 rounded-3xl border border-white/5">
-                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Patient Narrative</h3>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Your Entry</h3>
                                 <p className="text-xl font-medium italic leading-relaxed text-gray-200">"{report.content}"</p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-4">Professional Analysis</h3>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-4">Analysis</h3>
                                 <div className="text-lg leading-relaxed text-gray-300 whitespace-pre-wrap">{report.doctorReport}</div>
                             </div>
                         </>
                     ) : (
                          <>
                             <div className="bg-white/5 p-8 rounded-3xl border border-white/5">
-                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Assessment Metrics</h3>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Assessment Score</h3>
                                 {report.result && <p className="text-2xl font-black italic text-white"><span className="text-primary">{report.result.level}:</span> {report.result.recommendation}</p>}
-                                <p className="text-sm font-bold text-muted-foreground mt-2">Quantitative Score: {report.score}</p>
+                                <p className="text-sm font-bold text-muted-foreground mt-2">Score: {report.score}</p>
                             </div>
                              <div>
                                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-4">Clinical Guidance</h3>
@@ -165,15 +165,15 @@ const ReportCard = ({ report }: { report: Report }) => {
                 </div>
             </div>
 
-            <div className="p-8 md:p-10">
+            <div className="p-5 sm:p-8 md:p-10">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10 pb-8 border-b border-white/5">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                              <span className="text-[10px] font-black uppercase tracking-widest text-primary">Verified Report</span>
                         </div>
-                        <h3 className="text-3xl font-black italic tracking-tighter text-white">{title}</h3>
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2">Archived on {dateStr}</p>
+                        <h3 className="text-2xl sm:text-3xl font-black italic tracking-tighter text-white">{title}</h3>
+                        <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2">Archived on {dateStr}</p>
                     </div>
                     <Button 
                         onClick={handleDownloadPdf} 
@@ -203,7 +203,7 @@ const ReportCard = ({ report }: { report: Report }) => {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-primary mb-2">
                                     <FileText className="w-4 h-4"/>
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Specialist Insights</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Specialist Review</span>
                                 </div>
                                 <div className="p-2 space-y-4">
                                     <p className="text-gray-200 font-medium leading-relaxed whitespace-pre-wrap">{report.doctorReport}</p>
@@ -285,15 +285,15 @@ function UserMessages() {
 
     return (
         <GlassCard interactive={false} className="border-white/10 mt-16 rounded-[3rem] overflow-hidden shadow-2xl">
-            <div className="p-8 md:p-10">
+            <div className="p-5 sm:p-8 md:p-10">
                 <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
                     <div className="flex items-center gap-4">
                         <div className="p-3 rounded-2xl bg-primary/10 text-primary">
                             <MessageSquare className="w-6 h-6" />
                         </div>
                         <div>
-                             <h3 className="text-2xl font-black italic tracking-tight text-white">Soul Specialist Chat</h3>
-                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Direct Clinical Communication</p>
+                             <h3 className="text-2xl font-black italic tracking-tight text-white">Chat with Doctor</h3>
+                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Send a message</p>
                         </div>
                     </div>
                 </div>
@@ -353,7 +353,7 @@ function UserMessages() {
                         <Input 
                             value={newMessage} 
                             onChange={(e) => setNewMessage(e.target.value)} 
-                            placeholder="Address your specialist..." 
+                            placeholder="Type a message..." 
                             className="flex-1 bg-white/5 border-white/10 rounded-full px-6 h-12 text-sm font-medium focus-visible:ring-primary/40 focus:bg-white/10 transition-all" 
                         />
                         <Button type="submit" size="icon" className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20">
@@ -415,14 +415,16 @@ export default function ReportsPage() {
             <header className="border-b border-white/10 p-4 md:p-6 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
                 <div className="flex items-center gap-4">
                     <SidebarTrigger className="md:hidden" />
-                    <div>
-                      <h1 className="text-xl md:text-2xl font-black italic tracking-tight">Nexus Reports</h1>
-                      <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">Expert Clinical Oversight</p>
+                    <div className="flex-1">
+                      <h1 className="text-lg sm:text-xl md:text-2xl font-black italic tracking-tight">Nexus Reports</h1>
+                      <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest leading-none mt-1">Expert Clinical Oversight</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden xs:block">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
@@ -432,11 +434,11 @@ export default function ReportsPage() {
                      <motion.div 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-16 text-center lg:text-left"
+                        className="mb-8 md:mb-16 text-center lg:text-left"
                     >
-                        <h1 className="text-5xl md:text-6xl font-black italic tracking-tighter text-white mb-4">Professional Insights</h1>
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black italic tracking-tighter text-white mb-4">Journey Reports</h1>
                         <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed">
-                            A secure archive of your journey's milestones, reviewed & certified by our clinical elite.
+                            A secure archive of your progress, reviewed by our specialists.
                         </p>
                     </motion.div>
                     

@@ -14,6 +14,7 @@ import { generateAffirmation } from '@/ai/flows/generate-affirmation';
 import { useToast } from '@/hooks/use-toast';
 import { GenZToggle } from '@/components/genz-toggle';
 import { SOSButton } from '@/components/sos-button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LastEntry {
     mood: string;
@@ -101,27 +102,33 @@ export default function AffirmationsPage() {
                     <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
                     <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">Resonance</h1>
+                        <h1 className="text-xl md:text-2xl font-black italic tracking-tighter text-white uppercase">Affirmations</h1>
                         <div className="flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Neural Uplift Active</span>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Daily Support</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden xs:block">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
 
             <main className="flex-1 overflow-auto p-6 md:p-12 lg:p-16 flex flex-col items-center justify-center">
-                 {isLoading ? (
-                    <div className="relative">
-                        <div className="w-16 h-16 rounded-full border-t-2 border-primary animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 animate-pulse" />
-                        </div>
+                {isLoading ? (
+                    <div className="w-full max-w-3xl space-y-8">
+                        <Skeleton className="h-20 w-3/4 mx-auto rounded-3xl" />
+                        <GlassCard className="rounded-[2.5rem] p-12 lg:p-20">
+                             <div className="space-y-8 flex flex-col items-center">
+                                <Skeleton className="h-16 w-16 rounded-2xl" />
+                                <Skeleton className="h-24 w-full rounded-2xl" />
+                                <Skeleton className="h-16 w-48 rounded-2xl" />
+                             </div>
+                        </GlassCard>
                     </div>
                 ) : (
                     <div className="w-full max-w-5xl space-y-12">
@@ -130,31 +137,25 @@ export default function AffirmationsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="text-center space-y-4"
                         >
-                            <h1 className="text-5xl md:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
-                                Morning <span className="text-primary italic">Manifest.</span>
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
+                                Daily <span className="text-primary italic">Positivity.</span>
                             </h1>
                             <p className="text-lg text-muted-foreground/80 font-medium leading-relaxed max-w-2xl mx-auto italic">
                                 "{lastEntry ? (
                                     <>
-                                        Calibrating for your <span className="text-primary font-black uppercase tracking-widest">{lastEntry.mood}</span> state...
+                                        Creating for your <span className="text-primary font-black uppercase tracking-widest">{lastEntry.mood}</span> mood...
                                     </>
-                                ) : "Initiating daily psychological alignment."}"
+                                ) : "Preparing your daily affirmation."}"
                             </p>
                         </motion.div>
 
                         <div className="relative mt-8 group">
-                            <motion.div 
-                                animate={{ scale: [1, 1.02, 1] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute -inset-4 bg-gradient-to-r from-primary/10 via-blue-500/10 to-primary/10 rounded-[3rem] blur-2xl opacity-50" 
-                            />
-                            
-                            <GlassCard className="mx-auto max-w-3xl rounded-[2.5rem] p-12 md:p-20 shadow-2xl relative overflow-hidden">
+                            <GlassCard className="mx-auto max-w-3xl rounded-[2.5rem] p-6 md:p-12 lg:p-20 shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
                                 
                                 <div className="relative flex flex-col items-center justify-center text-center space-y-12">
                                     <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
-                                        <Sparkles className="h-8 w-8 text-primary shadow-2xl animate-pulse" />
+                                        <Sparkles className="h-8 w-8 text-primary shadow-2xl transition-all" />
                                     </div>
 
                                     <div className="min-h-[120px] flex items-center justify-center">
@@ -165,19 +166,19 @@ export default function AffirmationsPage() {
                                                     initial={{ opacity: 0 }}
                                                     animate={{ opacity: 1 }}
                                                     exit={{ opacity: 0 }}
-                                                    className="flex items-center gap-3"
+                                                    className="flex flex-col items-center gap-4"
                                                 >
-                                                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Generating Frequency</span>
+                                                    <Skeleton className="h-12 w-64 md:w-96 rounded-2xl" />
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 animate-pulse">Neural Link Syncing...</span>
                                                 </motion.div>
                                             ) : (
                                                 <motion.p 
                                                     key={affirmation}
-                                                    initial={{ opacity: 0, y: 10, filter: 'blur(10px)' }}
-                                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                                    exit={{ opacity: 0, y: -10, filter: 'blur(10px)' }}
-                                                    transition={{ duration: 0.8, ease: "circOut" }}
-                                                    className="text-3xl md:text-4xl font-black italic tracking-tight text-white leading-tight"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    transition={{ duration: 0.6, ease: "circOut" }}
+                                                    className="text-2xl sm:text-3xl md:text-4xl font-black italic tracking-tight text-white leading-tight select-none"
                                                 >
                                                     {affirmation}
                                                 </motion.p>
@@ -190,20 +191,12 @@ export default function AffirmationsPage() {
                                             onClick={handleGenerateAffirmation} 
                                             disabled={isGenerating} 
                                             size="lg" 
-                                            className="h-16 px-10 rounded-2xl bg-white text-black hover:bg-white/90 font-black italic text-sm tracking-widest shadow-2xl transition-all active:scale-95 group overflow-hidden"
+                                            className="h-16 px-10 rounded-2xl bg-primary text-white hover:bg-primary/90 font-black italic text-sm tracking-widest shadow-2xl transition-all active:scale-95 group overflow-hidden border-0"
                                         >
-                                            <div className="absolute inset-0 bg-primary/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                                            <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
                                             <RefreshCw className={cn("mr-3 h-5 w-5 relative z-10", isGenerating && "animate-spin")} />
-                                            <span className="relative z-10">REFRESH PROTOCOL</span>
+                                             <span className="relative z-10">NEW AFFIRMATION</span>
                                         </Button>
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="icon" className="h-16 w-16 rounded-2xl border-white/10 hover:bg-white/5 group transition-all">
-                                                <Heart className="h-5 w-5 group-hover:text-rose-400 group-hover:fill-rose-400 transition-colors" />
-                                            </Button>
-                                            <Button variant="outline" size="icon" className="h-16 w-16 rounded-2xl border-white/10 hover:bg-white/5 group transition-all">
-                                                <Share2 className="h-5 w-5 group-hover:text-primary transition-colors" />
-                                            </Button>
-                                        </div>
                                     </div>
                                 </div>
                             </GlassCard>

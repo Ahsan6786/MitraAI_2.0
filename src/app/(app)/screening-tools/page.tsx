@@ -66,10 +66,10 @@ export default function ScreeningToolsPage() {
                     <SidebarTrigger className="h-12 w-12 rounded-2xl border border-white/10 hover:bg-primary/10 hover:border-primary/20 transition-all active:scale-95" />
                     <div className="hidden sm:block h-10 w-px bg-white/5 mx-2" />
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-black italic tracking-tighter text-white">Screening Hub</h1>
+                        <h1 className="text-xl md:text-2xl font-black italic tracking-tighter text-white">Self-Check Hub</h1>
                         <div className="flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Diagnostic Interface Active</span>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Tools Ready</span>
                         </div>
                     </div>
                 </div>
@@ -80,18 +80,18 @@ export default function ScreeningToolsPage() {
                 </div>
             </header>
 
-            <main className="flex-1 overflow-auto p-6 md:p-12 lg:p-16">
+            <main className="flex-1 overflow-auto p-6 md:p-12">
                 <div className="max-w-6xl mx-auto space-y-16">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center space-y-4 max-w-3xl mx-auto"
                     >
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
-                            Decode Your <span className="text-primary italic">Well-being.</span>
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black italic tracking-tightest leading-tight text-white capitalize">
+                            Understand Your <span className="text-primary italic">Mind.</span>
                         </h1>
-                        <p className="text-xl text-muted-foreground/80 font-medium leading-relaxed">
-                            Access clinically-validated cognitive screenings designed to provide rapid neurological and emotional insights.
+                        <p className="text-base md:text-xl text-muted-foreground/80 font-medium leading-relaxed">
+                            Access validated mental health checks designed to provide rapid insights into your well-being.
                         </p>
                     </motion.div>
 
@@ -129,7 +129,7 @@ export default function ScreeningToolsPage() {
                                         <div className="pt-4 mt-auto">
                                             <Button asChild className="w-full h-14 rounded-2xl bg-white text-black hover:bg-white/90 shadow-xl font-black italic transition-all group-hover:scale-[1.02] active:scale-95">
                                                 <Link href={`/questionnaire?test=${tool.id}`}>
-                                                    Initiate Protocol <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                                    Start Check <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                                 </Link>
                                             </Button>
                                         </div>
@@ -143,10 +143,10 @@ export default function ScreeningToolsPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.8 }}
-                        className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 text-center bg-gradient-to-r from-primary/5 to-transparent"
+                        className="p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 border border-white/5 text-center bg-gradient-to-r from-primary/5 to-transparent"
                     >
-                        <p className="text-sm text-muted-foreground/60 font-medium">
-                            <span className="text-primary font-bold">Important:</span> These screenings are diagnostic aids and do not constitute a final clinical diagnosis. Always consult with a licensed professional for a full evaluation.
+                        <p className="text-xs md:text-sm text-muted-foreground/60 font-medium">
+                            <span className="text-primary font-bold">Important:</span> These checks are aids and do not replace professional medical advice. Always consult with a licensed professional for a full evaluation.
                         </p>
                     </motion.div>
                 </div>

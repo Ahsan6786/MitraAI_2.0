@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Link from 'next/link';
 import { GenZToggle } from '@/components/genz-toggle';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { SOSButton } from '@/components/sos-button';
 import { useRouter } from 'next/navigation';
 import { ToastAction } from '@/components/ui/toast';
@@ -247,9 +247,11 @@ function JournalPageContent() {
               <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">A Sacred Space for Your Soul</p>
             </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
             <SOSButton />
-            <GenZToggle />
+            <div className="hidden xs:block">
+                <GenZToggle />
+            </div>
             <ThemeToggle />
         </div>
       </header>
@@ -264,12 +266,12 @@ function JournalPageContent() {
           >
              <GlassCard interactive={false} className="border-primary/20 rounded-[3rem] overflow-hidden">
                 <div className="p-8">
-                    <div className="space-y-2 mb-8">
-                        <h2 className="text-3xl font-black italic tracking-tighter flex items-center gap-3">
-                            <PenSquare className="w-8 h-8 text-primary"/> 
+                    <div className="space-y-4 mb-8">
+                        <h2 className="text-2xl sm:text-3xl font-black italic tracking-tighter flex items-center gap-3">
+                            <PenSquare className="w-6 h-6 sm:w-8 sm:h-8 text-primary"/> 
                             What's unfolding within?
                         </h2>
-                        <p className="text-sm text-muted-foreground font-medium">
+                        <p className="text-xs sm:text-sm text-muted-foreground font-medium">
                             Share your truth. Your journey is analyzed with care & precision.
                         </p>
                     </div>
@@ -277,19 +279,19 @@ function JournalPageContent() {
                     <div className="relative group">
                         <Textarea
                             placeholder="Pour your thoughts here..."
-                            className="bg-white/5 border-2 border-white/10 rounded-[2rem] p-8 text-lg font-medium min-h-[400px] focus-visible:ring-primary/30 transition-all placeholder:text-muted-foreground/30 leading-relaxed"
+                            className="bg-white/5 border-2 border-white/10 rounded-[2rem] p-5 sm:p-8 text-base sm:text-lg font-medium min-h-[250px] sm:min-h-[400px] focus-visible:ring-primary/30 transition-all placeholder:text-muted-foreground/30 leading-relaxed"
                             value={entry}
                             onChange={(e) => setEntry(e.target.value)}
                             disabled={isSubmitting}
                         />
-                        <div className="absolute bottom-6 right-8 flex items-center gap-4">
+                        <div className="absolute bottom-6 right-6 sm:right-8 flex items-center gap-3 sm:gap-4 flex-wrap justify-end">
                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">Cost: {TOKEN_COST} Energy</span>
                              <Button 
                                 onClick={handleSaveTextEntry} 
                                 disabled={isSubmitting || !entry.trim()}
-                                className="rounded-full bg-primary hover:bg-primary/90 text-white font-black italic px-10 h-12 shadow-xl shadow-primary/20 transition-all active:scale-95"
+                                className="rounded-full bg-primary hover:bg-primary/90 text-white font-black italic px-8 sm:px-10 h-11 sm:h-12 shadow-xl shadow-primary/20 transition-all active:scale-95 text-xs sm:text-sm"
                              >
-                                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Reflection"}
+                                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Reflection"}
                             </Button>
                         </div>
                     </div>
@@ -362,36 +364,6 @@ function JournalPageContent() {
 }
 
 export default function JournalPage() {
-    const [isClient, setIsClient] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
-    const SESSION_KEY = 'hasSeenJournalIntro';
-
-    useEffect(() => {
-        setIsClient(true);
-        const hasSeen = sessionStorage.getItem(SESSION_KEY);
-        if (hasSeen) {
-            setShowIntro(false);
-        }
-    }, []);
-
-    const handleIntroFinish = () => {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        setShowIntro(false);
-    };
-
-    if (!isClient) {
-        return null;
-    }
-    
-    if (showIntro) {
-        return <SectionIntroAnimation 
-            onFinish={handleIntroFinish} 
-            icon={<BookHeart className="w-full h-full" />}
-            title="Chronicles"
-            subtitle="The ink of your soul."
-        />;
-    }
-
     return <JournalPageContent />;
 }
 

@@ -12,7 +12,7 @@ import { subDays, format, eachDayOfInterval, startOfDay } from 'date-fns';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenZToggle } from '@/components/genz-toggle';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { SOSButton } from '@/components/sos-button';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -148,17 +148,19 @@ function DashboardPageContent() {
 
     return (
         <div className="h-full flex flex-col bg-background/50">
-            <header className="border-b border-white/10 p-4 md:p-6 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
+            <header className="border-b border-white/10 p-4 flex items-center justify-between backdrop-blur-md sticky top-0 z-50 h-16 md:h-20">
                 <div className="flex items-center gap-4">
-                    <SidebarTrigger className="md:hidden" />
+                    <SidebarTrigger className="h-10 w-10 md:h-12 md:w-12 rounded-xl border border-white/10" />
                     <div>
                         <h1 className="text-xl md:text-2xl font-black italic tracking-tight">Wellness Dashboard</h1>
-                        <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">Visualize Your Journey</p>
+                        <p className="text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-widest">Overview</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden xs:block">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
@@ -197,7 +199,7 @@ function DashboardPageContent() {
                                         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                                             <div className="space-y-1">
                                                 <h2 className="text-xl font-black italic tracking-tight">Mood Trends</h2>
-                                                <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Progress Visualization</p>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Your Progress</p>
                                             </div>
                                             <TabsList className="bg-background/20 backdrop-blur-md border border-white/10 rounded-full p-1 h-auto">
                                                 <TabsTrigger value="weekly" className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-bold text-xs uppercase tracking-widest">7 Days</TabsTrigger>
@@ -253,7 +255,7 @@ function DashboardPageContent() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <motion.div variants={itemVariants} className="md:col-span-2">
-                                <GlassCard interactive={false} className="border-white/10 p-8 h-full">
+                                <GlassCard interactive={false} className="border-white/10 p-5 sm:p-8 h-full">
                                     <div className="flex flex-col h-full">
                                         <div className="mb-8">
                                             <h2 className="text-xl font-black italic tracking-tight flex items-center gap-2">
@@ -318,35 +320,5 @@ function DashboardPageContent() {
 }
 
 export default function DashboardPage() {
-    const [isClient, setIsClient] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
-    const SESSION_KEY = 'hasSeenDashboardIntro';
-
-    useEffect(() => {
-        setIsClient(true);
-        const hasSeen = sessionStorage.getItem(SESSION_KEY);
-        if (hasSeen) {
-            setShowIntro(false);
-        }
-    }, []);
-
-    const handleIntroFinish = () => {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        setShowIntro(false);
-    };
-
-    if (!isClient) {
-        return null;
-    }
-    
-    if (showIntro) {
-        return <SectionIntroAnimation 
-            onFinish={handleIntroFinish} 
-            icon={<LayoutDashboard className="w-full h-full" />}
-            title="Dashboard"
-            subtitle="Visualize your mood patterns."
-        />;
-    }
-
     return <DashboardPageContent />;
 }

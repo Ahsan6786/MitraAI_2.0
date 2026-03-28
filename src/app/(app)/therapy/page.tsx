@@ -8,7 +8,7 @@ import { GenZToggle } from '@/components/genz-toggle';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ArrowLeft, Wind, Waves, Laugh, Frown, Info, Play, Maximize2, Shield, Heart } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { SOSButton } from '@/components/sos-button';
 import { GlassCard } from '@/components/glass-card';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,7 +29,7 @@ const therapyVideos: TherapyVideo[] = [
   {
     id: '22pSycMdCl0',
     title: 'Forest Resonance',
-    description: 'Calibrate your neural stress levels through high-fidelity forest immersion.',
+    description: 'Calm your mind through high-quality forest immersion.',
     mood: 'stress',
     icon: Wind,
     color: 'emerald',
@@ -37,7 +37,7 @@ const therapyVideos: TherapyVideo[] = [
   {
     id: 'jqq_ZdD5Zwg',
     title: 'Oceanic Frequency',
-    description: 'Harmonize your anxiety cycles with the rhythmic precision of tidal energy.',
+    description: 'Soothe your anxiety with the rhythmic sound of waves.',
     mood: 'anxiety',
     icon: Waves,
     color: 'blue',
@@ -91,8 +91,8 @@ function TherapyPageContent() {
             <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
             <div className="h-8 w-px bg-white/10 hidden md:block" />
             <div className="flex flex-col">
-              <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Neural_Sanctuary.</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/60 mt-1">Immersive Healing Hub</p>
+              <h1 className="text-xl font-black italic tracking-tighter leading-none">Relaxation Space</h1>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/60 mt-1">Peaceful Environments</p>
             </div>
         </div>
         <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ function TherapyPageContent() {
                                 className="h-12 border border-white/10 rounded-2xl px-6 font-black italic text-xs tracking-widest text-white hover:bg-white/5 active:scale-95 transition-all"
                             >
                                 <ArrowLeft className="mr-3 h-4 w-4" />
-                                EXIT_PROTOCOL
+                                BACK
                             </Button>
                             
                             <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
@@ -176,10 +176,10 @@ function TherapyPageContent() {
                                 </span>
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Healing Signals Online</span>
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black italic tracking-tightest leading-none text-white uppercase">
-                                IMMERSE.<br/>
-                                <span className="text-emerald-400">HEAL.</span><br/>
-                                ASCEND.
+                            <h1 className="text-4xl md:text-8xl font-black italic tracking-tightest leading-none text-white uppercase">
+                                RELAX.<br/>
+                                <span className="text-emerald-400">BREATHE.</span><br/>
+                                UNWIND.
                             </h1>
                             <p className="text-xl text-muted-foreground font-medium leading-relaxed max-w-2xl">
                                 Access immersive 360° neural environments calibrated for emotional restoration. Professional VR equipment recommended for maximum efficacy.
@@ -207,8 +207,8 @@ function TherapyPageContent() {
                         <div className="space-y-12">
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
                                 <div>
-                                    <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-1">Restoration Protocols</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Choose your frequency</p>
+                                    <h2 className="text-2xl md:text-3xl font-black italic tracking-tighter uppercase mb-1">Restoration Protocols</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Choose your journey</p>
                                 </div>
                             </div>
 
@@ -245,7 +245,7 @@ function TherapyPageContent() {
                                                         {video.description}
                                                     </p>
                                                     <div className="pt-2">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">INITIALIZE_HEALING_STREAM //</span>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">START JOURNEY //</span>
                                                     </div>
                                                 </div>
 
@@ -267,35 +267,5 @@ function TherapyPageContent() {
 }
 
 export default function TherapyPage() {
-    const [isClient, setIsClient] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
-    const SESSION_KEY = 'hasSeenTherapyIntro';
-
-    useEffect(() => {
-        setIsClient(true);
-        const hasSeen = sessionStorage.getItem(SESSION_KEY);
-        if (hasSeen) {
-            setShowIntro(false);
-        }
-    }, []);
-
-    const handleIntroFinish = () => {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        setShowIntro(false);
-    };
-
-    if (!isClient) {
-        return null;
-    }
-    
-    if (showIntro) {
-        return <SectionIntroAnimation 
-            onFinish={handleIntroFinish} 
-            icon={<Sparkles className="w-full h-full" />}
-            title="Neural Sanctuary"
-            subtitle="An immersive healing experience."
-        />;
-    }
-
     return <TherapyPageContent />;
 }

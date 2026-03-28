@@ -11,7 +11,7 @@ import { generateAiNews, GenerateAiNewsOutput } from '@/ai/flows/generate-ai-new
 import { generateImage } from '@/ai/flows/generate-image';
 import { useToast } from '@/hooks/use-toast';
 import { GenZToggle } from '@/components/genz-toggle';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { SOSButton } from '@/components/sos-button';
 import { GlassCard } from '@/components/glass-card';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -95,8 +95,8 @@ function NewsPageContent() {
                     <SidebarTrigger className="text-white/60 hover:text-white transition-colors" />
                     <div className="h-8 w-px bg-white/10 hidden md:block" />
                     <div className="flex flex-col">
-                    <h1 className="text-xl font-black italic tracking-tighter leading-none uppercase">Collective_Intelligence.</h1>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Global AI Sentiment Feed</p>
+                    <h1 className="text-xl font-black italic tracking-tighter leading-none">AI Health News</h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mt-1">Latest Updates</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -119,8 +119,8 @@ function NewsPageContent() {
                                 <Loader2 className="w-16 h-16 animate-spin text-primary relative z-10" />
                             </div>
                             <div className="space-y-2">
-                                <p className="text-2xl font-black italic uppercase tracking-tightest">Synchronizing_Hub...</p>
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Aggregating global sentiment data</p>
+                                <p className="text-xl md:text-2xl font-black italic uppercase tracking-tightest">Loading News...</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Fetching latest mental health insights</p>
                             </div>
                         </div>
                     )}
@@ -134,7 +134,7 @@ function NewsPageContent() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                 >
-                                    <GlassCard className="p-0 rounded-[3rem] overflow-hidden group border-white/10 hover:border-primary/30 transition-all duration-700">
+                                    <GlassCard className="p-0 rounded-2xl md:rounded-[3rem] overflow-hidden group border-white/10 hover:border-primary/30 transition-all duration-700">
                                         <div className="grid grid-cols-1 lg:grid-cols-12">
                                             <div className="lg:col-span-5 relative h-80 lg:h-auto group-hover:scale-105 transition-transform duration-700">
                                                 <Image src={article.imageUrl} alt={article.text.headline} layout="fill" objectFit="cover" className="grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -149,7 +149,7 @@ function NewsPageContent() {
                                                         <Globe className="w-4 h-4" />
                                                         <span className="text-[10px] font-black uppercase tracking-[0.3em]">{article.timestamp.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                     </div>
-                                                    <h2 className="text-3xl md:text-5xl font-black italic tracking-tightest leading-tight text-white group-hover:text-primary transition-colors uppercase">
+                                                    <h2 className="text-2xl md:text-5xl font-black italic tracking-tightest leading-tight text-white group-hover:text-primary transition-colors uppercase">
                                                         {article.text.headline}
                                                     </h2>
                                                     <div className="prose prose-invert prose-sm font-medium leading-relaxed text-white/60 line-clamp-4">
@@ -158,7 +158,7 @@ function NewsPageContent() {
                                                 </div>
                                                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                                     <Button variant="ghost" className="text-xs font-black italic tracking-widest text-primary hover:text-white transition-colors group/btn">
-                                                        READ_FULL_TRANSCRIPT 
+                                                        READ MORE 
                                                         <ArrowLeft className="ml-2 h-4 w-4 rotate-180 group-hover/btn:translate-x-2 transition-transform" />
                                                     </Button>
                                                     <div className="flex gap-2">
@@ -183,12 +183,7 @@ function NewsPageContent() {
                                 variant="ghost"
                                 className="h-16 px-12 rounded-2.5rem border border-white/10 font-black italic text-xs tracking-widest text-white hover:bg-white/5 transition-all active:scale-95"
                             >
-                                {isGeneratingMore ? (
-                                    <Loader2 className="mr-3 h-5 w-5 animate-spin"/>
-                                ) : (
-                                    <RefreshCw className="mr-3 h-5 w-5"/>
-                                )}
-                                {isGeneratingMore ? 'EXPANDING_NEURAL_NETWORK...' : 'EXPAND_INTELLIGENCE_FEED'}
+                                {isGeneratingMore ? 'LOADING...' : 'MORE NEWS'}
                             </Button>
                         </div>
                     )}
@@ -199,35 +194,5 @@ function NewsPageContent() {
 }
 
 export default function NewsPage() {
-    const [isClient, setIsClient] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
-    const SESSION_KEY = 'hasSeenNewsIntro';
-
-    useEffect(() => {
-        setIsClient(true);
-        const hasSeen = sessionStorage.getItem(SESSION_KEY);
-        if (hasSeen) {
-            setShowIntro(false);
-        }
-    }, []);
-
-    const handleIntroFinish = () => {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        setShowIntro(false);
-    };
-
-    if (!isClient) {
-        return null;
-    }
-    
-    if (showIntro) {
-        return <SectionIntroAnimation 
-            onFinish={handleIntroFinish} 
-            icon={<Globe className="w-full h-full" />}
-            title="Collective Intelligence"
-            subtitle="The global pulse of AI sentiment."
-        />;
-    }
-
     return <NewsPageContent />;
 }

@@ -289,11 +289,11 @@ export default function LiveMoodPage() {
                         <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">Spectrum</h1>
                         <div className="flex items-center gap-2">
                              <div className={cn("w-1.5 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(var(--primary),0.8)]", isRecording ? "bg-rose-500 animate-ping" : "bg-primary animate-pulse")} />
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">{isRecording ? 'Sensor Monitoring' : 'Live Uplink Active'}</span>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60 hidden xs:block">{isRecording ? 'Sensor Monitoring' : 'Live Uplink Active'}</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                     <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
                         <Languages className="w-4 h-4 text-primary/60" />
                         <Select value={language} onValueChange={setLanguage} disabled={isRecording || isProcessing}>
@@ -308,18 +308,20 @@ export default function LiveMoodPage() {
                         </Select>
                     </div>
                     <SOSButton />
-                    <GenZToggle />
+                    <div className="hidden md:flex">
+                        <GenZToggle />
+                    </div>
                     <ThemeToggle />
                 </div>
             </header>
 
              <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                 {/* Left Side: Neural Optic Sensor */}
-                <div className="w-full lg:w-[45%] p-6 flex flex-col min-h-[400px]">
+                <div className="w-full lg:w-[45%] p-4 sm:p-6 flex flex-col min-h-[300px] sm:min-h-[400px]">
                     <GlassCard className="flex-1 flex flex-col rounded-[2.5rem] relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 pointer-events-none" />
                         
-                        <div className="p-8 flex items-center justify-between relative z-10 border-b border-white/5">
+                        <div className="p-4 sm:p-8 flex items-center justify-between relative z-10 border-b border-white/5">
                             <div className="flex items-center gap-4">
                                 <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                                     <Camera className="w-5 h-5 text-primary" />
@@ -349,6 +351,7 @@ export default function LiveMoodPage() {
                                     <AnimatePresence>
                                         {(isRecording || isProcessing) && (
                                             <motion.div 
+                                                key="scanner-line"
                                                 initial={{ top: '0%' }}
                                                 animate={{ top: '100%' }}
                                                 transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
@@ -379,7 +382,7 @@ export default function LiveMoodPage() {
                 {/* Right Side: Neural Chat Uplink */}
                 <div className="flex-1 flex flex-col p-6 space-y-6">
                     <GlassCard className="flex-1 flex flex-col rounded-[2.5rem] relative overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between">
+                        <div className="p-4 sm:p-8 border-b border-white/5 flex items-center justify-between">
                              <div className="flex items-center gap-4">
                                 <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
                                     <Bot className="w-5 h-5 text-primary" />
@@ -395,7 +398,7 @@ export default function LiveMoodPage() {
                         </div>
 
                         <ScrollArea className="flex-1" viewportRef={scrollViewportRef}>
-                            <div className="p-8 space-y-8">
+                            <div className="p-4 sm:p-8 space-y-8">
                                 <AnimatePresence initial={false}>
                                     {chatMessages.length === 0 && !isProcessing && (
                                         <motion.div 

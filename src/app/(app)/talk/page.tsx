@@ -15,7 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GenZToggle } from '@/components/genz-toggle';
-import SectionIntroAnimation from '@/components/section-intro-animation';
+
 import { useAuth } from '@/hooks/use-auth';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -262,10 +262,10 @@ function TalkPageContent() {
   }, []);
 
   const getStatusText = () => {
-    if (isRecording) return "Listening to your soul...";
-    if (isLoading) return "Analyzing neural pathways...";
-    if (chatHistory.length > 0) return "Continue the flow...";
-    return "Tap to ignite the connection.";
+    if (isRecording) return "Listening...";
+    if (isLoading) return "Thinking...";
+    if (chatHistory.length > 0) return "Continue talking...";
+    return "Tap to start talking.";
   }
 
   const userAvatarFallback = user?.displayName?.[0] || user?.email?.[0] || 'U';
@@ -303,11 +303,11 @@ function TalkPageContent() {
           <div className="flex flex-col">
             <h1 className="text-2xl font-black italic tracking-tighter flex items-center gap-2 text-white">
                 <Phone className="w-5 h-5 text-primary fill-primary/20 animate-pulse" />
-                Soul Sync
+                Voice Talk
             </h1>
             <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">Audio Uplink Active</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60 hidden xs:block">Microphone On</span>
             </div>
           </div>
         </div>
@@ -324,8 +324,10 @@ function TalkPageContent() {
               ))}
             </SelectContent>
           </Select>
-          <div className="hidden sm:flex gap-3">
-            <GenZToggle />
+          <div className="flex gap-2 sm:gap-3">
+            <div className="hidden md:flex">
+              <GenZToggle />
+            </div>
             <ThemeToggle />
           </div>
         </div>
@@ -337,6 +339,7 @@ function TalkPageContent() {
             <AnimatePresence mode="popLayout">
               {chatHistory.length === 0 && (
                 <motion.div
+                  key="empty-state"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center py-24 text-center space-y-8"
@@ -352,9 +355,9 @@ function TalkPageContent() {
                     </div>
                   </div>
                   <div className="space-y-4 max-w-lg">
-                    <h2 className="text-4xl font-black italic tracking-tight text-white">Voice your soul.</h2>
+                    <h2 className="text-3xl sm:text-4xl font-black italic tracking-tight text-white">Start talking.</h2>
                     <p className="text-muted-foreground font-medium text-lg leading-relaxed">
-                        Step into a zero-latency empathetic space. I'm here to listen to your voice, your emotions, and your journey.
+                        Step into a friendly space. I'm here to listen to your voice, your emotions, and your journey.
                     </p>
                   </div>
                 </motion.div>
@@ -427,8 +430,8 @@ function TalkPageContent() {
         </ScrollArea>
 
         {/* Immersive Bottom Controls */}
-        <div className="h-64 shrink-0 flex flex-col items-center justify-center gap-8 z-10 bg-gradient-to-t from-background via-background/90 to-transparent">
-          <div className="flex items-center gap-6 sm:gap-12">
+        <div className="h-64 shrink-0 flex flex-col items-center justify-center gap-6 sm:gap-8 z-10 bg-gradient-to-t from-background via-background/90 to-transparent">
+          <div className="flex items-center gap-4 sm:gap-12">
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                 asChild
@@ -525,31 +528,5 @@ function TalkPageContent() {
 }
 
 export default function TalkPage() {
-  const [isClient, setIsClient] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
-  const SESSION_KEY = 'hasSeenTalkIntro';
-
-  useEffect(() => {
-    setIsClient(true);
-    const hasSeen = sessionStorage.getItem(SESSION_KEY);
-    if (hasSeen) setShowIntro(false);
-  }, []);
-
-  const handleIntroFinish = () => {
-    sessionStorage.setItem(SESSION_KEY, 'true');
-    setShowIntro(false);
-  };
-
-  if (!isClient) return null;
-
-  if (showIntro) {
-    return <SectionIntroAnimation
-      onFinish={handleIntroFinish}
-      icon={<Phone className="w-full h-full" />}
-      title="Talk to Mitra"
-      subtitle="Engage in a live, sub-second empathetic conversation."
-    />;
-  }
-
   return <TalkPageContent />;
 }
